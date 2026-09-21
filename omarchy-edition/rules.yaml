@@ -1,0 +1,131 @@
+Player:
+	PlayerResources:
+		DefaultCash: 1500
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, omarchy.lua
+	MissionData:
+		Briefing: Comrade DHH has fled. The Central Planning Compositor has decreed that all windows shall float.\n\nEstablish the ISO, sync your packages, and destroy the Compositor before the Five-Year Plan completes.\n\nThe Commies hold the far side of the river. One ford, one pontoon bridge. Both are watched.
+	Faction@allies:
+		Name: faction-omarchians.name
+	Faction@soviet:
+		Name: faction-commies.name
+
+FACT:
+	Tooltip:
+		Name: omarchy-fact.name
+	Buildable:
+		Description: omarchy-fact.description
+
+FACT.COMMIE:
+	Inherits: FACT
+	Tooltip:
+		Name: commie-fact.name
+	RenderSprites:
+		Image: fact
+
+POWR:
+	Tooltip:
+		Name: omarchy-powr.name
+	Buildable:
+		Description: omarchy-powr.description
+
+POWR.COMMIE:
+	Inherits: POWR
+	Tooltip:
+		Name: actor-powr.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: powr
+
+PROC:
+	Tooltip:
+		Name: omarchy-proc.name
+	Buildable:
+		Description: omarchy-proc.description
+
+TENT:
+	Tooltip:
+		Name: omarchy-tent.name
+	Buildable:
+		Description: omarchy-tent.description
+
+WEAP:
+	Tooltip:
+		Name: omarchy-weap.name
+	Buildable:
+		Description: omarchy-weap.description
+
+WEAP.COMMIE:
+	Inherits: WEAP
+	Tooltip:
+		Name: actor-weap.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: weap
+
+PDOX:
+	Tooltip:
+		Name: omarchy-pdox.name
+	Buildable:
+		Description: omarchy-pdox.description
+
+IRON:
+	Tooltip:
+		Name: commie-iron.name
+
+HARV:
+	Tooltip:
+		Name: omarchy-harv.name
+	Buildable:
+		Description: omarchy-harv.description
+
+MCV:
+	Tooltip:
+		Name: omarchy-mcv.name
+
+E1:
+	Tooltip:
+		Name: omarchy-e1.name
+
+E1.CADRE:
+	Inherits: E1
+	Tooltip:
+		Name: commie-e1.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: e1
+
+E3:
+	Tooltip:
+		Name: omarchy-e3.name
+
+DOG:
+	Tooltip:
+		Name: commie-dog.name
+
+1TNK:
+	Tooltip:
+		Name: omarchy-1tnk.name
+	Buildable:
+		Description: omarchy-1tnk.description
+	Mobile:
+		Speed: 130
+
+2TNK:
+	Tooltip:
+		Name: omarchy-2tnk.name
+
+3TNK:
+	Tooltip:
+		Name: commie-3tnk.name
+	Mobile:
+		Speed: 58
+
+4TNK:
+	Tooltip:
+		Name: commie-4tnk.name
