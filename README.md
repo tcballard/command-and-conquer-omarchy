@@ -9,7 +9,8 @@ Telemetry, and a particularly aggressive Antivirus.
 **Package Conflict** gives both sides room to build, equal ore fields and
 normal skirmish AI. No scripted waves or campaign countdown.
 
-**[Install and play →](SKIRMISH.md)**
+**[Install and play →](SKIRMISH.md)** — one installer includes the custom
+artwork and map, installs OpenRA if needed, and adds an app-menu launcher.
 
 ## A custom army on both sides
 

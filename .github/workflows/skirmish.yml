@@ -18,6 +18,12 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build skirmish
         run: python tools/build_skirmish.py
+      - name: Build single-file installer
+        run: |
+          python tools/build_installer.py
+          bash -n packaging/install.sh.in
+          bash -n build/install-omarchy-edition.sh
+          cd build && sha256sum --check install-omarchy-edition.sh.sha256
       - name: Check user-local installer
         run: |
           sh -n tools/install_skirmish.sh
@@ -52,7 +58,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: omarchy-skirmish
-          path: build/omarchy-skirmish.oramap
+          path: |
+            build/omarchy-skirmish.oramap
+            build/install-omarchy-edition.sh
+            build/install-omarchy-edition.sh.sha256
       - uses: actions/upload-artifact@v4
         with:
           name: skirmish-art-previews

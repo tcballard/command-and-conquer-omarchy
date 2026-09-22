@@ -7,20 +7,54 @@ skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Install OpenRA and its Red Alert content. From a complete checkout of the
-`codex/omarchy-skirmish` branch:
+Download **install-omarchy-edition.sh** from the build artifact attached to the
+[skirmish workflow](https://github.com/tcballard/command-and-conquer-omarchy/actions/workflows/skirmish.yml),
+then run it as your normal user:
 
 ```sh
-sudo pacman -S --needed openra python-pillow
-sh tools/install_skirmish.sh
+bash ~/Downloads/install-omarchy-edition.sh
 ```
 
-The installer builds and atomically installs the map for your current user.
-It supports the legacy `~/.openra` directory too. For a custom location:
+This single file includes the compiled map and all custom artwork. It installs
+OpenRA through pacman if missing, checks for version `20250330`, installs the
+map for your user and adds **Command & Conquer: Omarchy Edition** to the app
+menu. No Git, Python or source checkout is needed. Internet and sudo are only
+needed for installing the OpenRA package; OpenRA may also download its Red
+Alert content on first launch. Complete that content setup when prompted.
+The installer does not bundle the original game files or automatically start
+a match. It opens OpenRA Red Alert, where you select the skirmish below.
+
+Run the same installer again to update its map. Use `--no-launch` to install
+without opening the game. A different OpenRA release is rejected without
+silently downgrading it. This development installer targets x86_64 Omarchy /
+Arch; its portable lifecycle tests pass, but installation and desktop launch
+on an actual XPS remain untested.
+
+To remove it:
 
 ```sh
-sh tools/install_skirmish.sh --dest /path/to/openra/maps/ra/release-20250330
+bash ~/Downloads/install-omarchy-edition.sh --uninstall
 ```
+
+Or run `bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/uninstall.sh"`.
+Removal keeps OpenRA, downloaded content, saves and other maps. If this
+installer replaced an earlier Package Conflict map, that copy is restored.
+If you have edited the installed map, removal stops and preserves it; move
+that file aside before retrying. Both XDG and legacy `~/.openra` paths work.
+
+### Build from source
+
+```sh
+sudo pacman -S --needed python python-pillow
+python tools/build_skirmish.py
+python tools/build_installer.py
+bash build/install-omarchy-edition.sh
+```
+
+The build also writes a SHA-256 sidecar. Both outputs are deterministic for
+the same map and installer source. The checksum detects download damage;
+it is not a publisher signature. The older map-only developer installer
+remains available: `sh tools/install_skirmish.sh [--dest MAP_DIRECTORY]`.
 
 Restart OpenRA Red Alert, choose **Singleplayer → Skirmish**, and select
 **Omarchy Skirmish - Package Conflict**. Take the green Omarchian slot and
