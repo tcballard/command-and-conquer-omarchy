@@ -34,7 +34,7 @@ jobs:
       - name: Install engine libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y liblua5.1-0 libsdl2-2.0-0 libopenal1 libfreetype6
+          sudo apt-get install -y liblua5.1-0 libsdl2-2.0-0 libopenal1 libfreetype6 xvfb libgl1-mesa-dri libegl1
       - name: Build pinned OpenRA
         id: engine-build
         working-directory: engine
@@ -64,7 +64,7 @@ jobs:
           ./OpenRA.Utility omarchy --check-omarchy
           ./OpenRA.Utility omarchy --check-yaml
       - name: Smoke test the real bundled game client
-        run: python tools/smoke_bundle.py build/bundle
+        run: SDL_VIDEODRIVER=x11 xvfb-run -a python tools/smoke_bundle.py build/bundle
       - name: Build single-file installer
         run: |
           python tools/build_installer.py

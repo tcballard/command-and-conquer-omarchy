@@ -37,7 +37,7 @@ def main():
         support = root / 'support'
         with zipfile.ZipFile(archive) as z:
             z.extractall(support / 'Content/ra/v2')
-        env = dict(os.environ, SDL_VIDEODRIVER='offscreen', SDL_AUDIODRIVER='dummy',
+        env = dict(os.environ, SDL_VIDEODRIVER=os.environ.get('SDL_VIDEODRIVER', 'offscreen'), SDL_AUDIODRIVER='dummy',
                    ALSOFT_DRIVERS='null', LIBGL_ALWAYS_SOFTWARE='1')
         command = [str(bundle / 'OpenRA'), 'Game.Mod=omarchy', f'Engine.SupportDir={support}',
                    'Graphics.Mode=Windowed', 'Graphics.WindowedSize=1280,720',
@@ -47,6 +47,8 @@ def main():
         except subprocess.TimeoutExpired as exc:
             output = (exc.stdout or b'').decode(errors='replace')
         else:
+            for log in (support / 'Logs').glob('*.log'):
+                print(log.name + ':\n' + log.read_text(), flush=True)
             raise RuntimeError(f'Game exited before lobby check: {result.returncode}\n{result.stdout.decode()}\n{result.stderr.decode()}')
         server = (support / 'Logs/server.log').read_text()
         if 'Loading mod: omarchy' not in output or 'Initial mod: omarchy' not in server or 'has joined the game' not in server:
