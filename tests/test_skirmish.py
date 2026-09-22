@@ -11,6 +11,8 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import build_skirmish as sk
+import build_skirmish_art as art
+import build_art
 
 
 class SkirmishTests(unittest.TestCase):
@@ -18,7 +20,7 @@ class SkirmishTests(unittest.TestCase):
         resources, mines, trees = sk.layout()
         self.assertEqual(resources, {sk.mirror(k): v for k, v in resources.items()})
         self.assertEqual(set(mines), {sk.mirror(k) for k in mines})
-        blocked = {(x, y + 1) for x, y in trees} | set(mines)
+        blocked = sk.blocked_cells(mines, trees)
         self.assertEqual(blocked, {sk.mirror(k) for k in blocked})
         self.assertFalse(blocked & set(resources))
         for sx, sy in sk.SPAWNS:
@@ -28,7 +30,7 @@ class SkirmishTests(unittest.TestCase):
 
     def test_ground_routes_reach_enemy_and_every_ore_field(self):
         resources, mines, trees = sk.layout()
-        blocked = {(x, y + 1) for x, y in trees} | set(mines)
+        blocked = sk.blocked_cells(mines, trees)
         queue = deque([sk.SPAWNS[0]])
         seen = set(queue)
         while queue:
@@ -68,7 +70,6 @@ class SkirmishTests(unittest.TestCase):
             for key in re.findall(r"(?:Name|Description): ([\w-]+)\.(?:name|description)", rules):
                 self.assertIn(key, keys)
 
-    @unittest.skipUnless(list((ROOT / "omarchy-edition").glob("*.shp")), "Requires complete checkout artwork")
     def test_archive_is_reproducible_and_contains_all_referenced_art(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "map"
@@ -83,6 +84,36 @@ class SkirmishTests(unittest.TestCase):
                 sequences = archive.read("sequences.yaml").decode()
                 for name in re.findall(r"Filename: (\S+)", sequences):
                     self.assertIn(name, names)
+                self.assertEqual(len(archive.read("omarchy-art.pal")), 768)
+                self.assertLessEqual(max(archive.read("omarchy-art.pal")), 63)
+                for side in ("omarchy", "commie"):
+                    sprite = archive.read(f"{side}-yard.shp")
+                    count = struct.unpack_from("<H", sprite)[0]
+                    width, height = struct.unpack_from("<HH", sprite, 6)
+                    self.assertEqual((count, width, height), (34, 96, 96))
+                    decoded = []
+                    for i in range(count):
+                        offset = struct.unpack_from("<I", sprite, 14 + i * 8)[0] & 0xFFFFFF
+                        frame = build_art.lcw_decode(sprite[offset:], width * height)
+                        self.assertEqual(len(frame), width * height)
+                        decoded.append(frame)
+                    self.assertNotEqual(decoded[0], decoded[1])
+                    self.assertLess(sum(bool(p) for p in decoded[2]), sum(bool(p) for p in decoded[13]))
+                    self.assertTrue(any(80 <= p <= 95 for p in decoded[0]))
+                    self.assertLess(sum(bool(p) for p in decoded[-1]), sum(bool(p) for p in decoded[1]))
+
+    def test_original_sheet_and_faction_icon_coverage(self):
+        images = art.yard_images()
+        self.assertEqual(len(images), 4)
+        for im in images:
+            self.assertEqual(im.size, (96, 96))
+            self.assertEqual(im.getchannel("A").getextrema(), (0, 255))
+        icons = art.icon_images()
+        for entries, side in ((sk.roster.OMARCHY, "omarchy"), (sk.roster.COMMIE, "commie")):
+            for actor, *_ in entries:
+                if actor != "badr":
+                    self.assertIn((side, actor), icons)
+        self.assertNotEqual(icons["omarchy", "e1"].tobytes(), icons["commie", "e1"].tobytes())
 
 
 if __name__ == "__main__":

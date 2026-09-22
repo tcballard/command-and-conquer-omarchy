@@ -17,7 +17,15 @@ to check the balance and presentation.
 Requires OpenRA Red Alert `release-20250330` and its game content. This
 uses the original Red Alert foundation, not Red Alert 2 or Yuri's Revenge.
 
-## What it looks like so far
+## Original artwork
+
+![Original construction yards: healthy and damaged for each faction](assets/previews/construction-yards.png)
+
+Both factions have original construction-yard sprites and their own build
+icons. The image above is an asset preview, not a gameplay screenshot.
+The remaining units and buildings still use stock Red Alert artwork.
+
+## Earlier in-game screenshots
 
 These screenshots are from the earlier mission prototype. They show the
 shared roster and custom icons, not the new skirmish battlefield.
@@ -26,17 +34,14 @@ shared roster and custom icons, not the new skirmish battlefield.
 |---|---|
 | ![Omarchian base in the mission prototype](screenshots/01-omarchian-base.png) | ![Themed build menu in the mission prototype](screenshots/12-agent-terminal-build-tooltip.png) |
 
-Units and buildings still use stock Red Alert battlefield artwork. Original
-Omarchy unit and building sprites are a possible next step.
-
 ## Make it yours
 
 `tools/roster.py` holds the names and descriptions. `tools/build_skirmish.py`
-builds the map using the committed sidebar artwork, with Python and Pillow.
-Changing the icon artwork still uses the existing palette/font workflow in
-`tools/build_icons.py`.
+builds the map and original artwork with Python and Pillow.
+`sh tools/install_skirmish.sh` builds and installs it for your current user.
+Artwork sources and provenance live in [assets/](assets/README.md).
 
-The earlier mission and its build tools remain in `omarchy-edition/`;
+The earlier mission and its original build tools remain in `omarchy-edition/`;
 [INSTALL.md](INSTALL.md) covers that archived prototype and
 [NOTES.md](NOTES.md) records its development history. Current skirmish scope
 and testing limits are in [SKIRMISH.md](SKIRMISH.md).

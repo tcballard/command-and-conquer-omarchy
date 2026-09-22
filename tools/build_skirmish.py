@@ -2,19 +2,45 @@
 """Build the skirmish from the roster and committed icons; no EA build inputs needed."""
 import argparse
 from pathlib import Path
-import shutil
 import struct
 import zipfile
 
 import build_art
 import build_text
 import roster
+import build_skirmish_art
 
 ROOT = Path(__file__).resolve().parent.parent
 SIZE = 96
 BOUNDS = (2, 2, 92, 92)
 SPAWNS = ((18, 73), (77, 22))
 ORE_CENTRES = ((30, 74), (18, 57), (38, 48))
+
+
+def scenery():
+    """Mirrored central settlement and rocky flanks; buildings use 2x2 footprints."""
+    buildings = [("v02", 44, 40), ("v02", 50, 54),
+                 ("v03", 40, 38), ("v03", 54, 56)]
+    rocks, rough = set(), set()
+    for x in range(25, 30):
+        for y in range(34, 40):
+            if (x + y) % 3 != 0:
+                rocks.add((x, y))
+                rocks.add(mirror((x, y)))
+    for x in range(38, 49):
+        for y in range(29, 36):
+            if (x - 43) ** 2 + (y - 32) ** 2 < 28 and (x * 11 + y * 7) % 4:
+                rough.add((x, y))
+                rough.add(mirror((x, y)))
+    return buildings, rocks, rough
+
+
+def blocked_cells(mines, trees):
+    buildings, rocks, _ = scenery()
+    blocked = {(x, y + 1) for x, y in trees} | set(mines) | rocks
+    for _, x, y in buildings:
+        blocked.update((x + dx, y + dy) for dx in range(2) for dy in range(2))
+    return blocked
 
 
 def mirror(cell):
@@ -56,6 +82,13 @@ World:
 		Name: faction-commies.name
 	SpawnStartingUnits:
 		StartingUnitsClass: light
+	PaletteFromFile@OMARCHY:
+		Name: omarchy-art
+		Filename: omarchy-art.pal
+	PlayerColorPalette@OMARCHY:
+		BasePalette: omarchy-art
+		BaseName: omarchy-player
+		RemapIndex: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
 """]
     omarchy = {entry[0]: entry for entry in roster.OMARCHY}
     commies = {entry[0]: entry for entry in roster.COMMIE}
@@ -75,8 +108,18 @@ World:
                       f"\t\tName: commie-{actor}.name\n"
                       "\t\tRequiresCondition: omarchy-soviet-owner\n")
         # BADR is a support aircraft, not a buildable unit.
-        if entry[2] and actor != "badr":
-            block += f"\tBuildable:\n\t\tDescription: {side}-{actor}.description\n"
+        if actor != "badr":
+            block += "\tBuildable:\n\t\tIconPalette: omarchy-art\n"
+            if entry[2]:
+                block += f"\t\tDescription: {side}-{actor}.description\n"
+            block += f"\tRenderSprites:\n\t\tImage: {side}-{actor}\n"
+            if ours and theirs:
+                block += "\t\tFactionImages:\n"
+                for faction in ("soviet", "russia", "ukraine"):
+                    block += f"\t\t\t{faction}: commie-{actor}\n"
+            if actor == "fact":
+                block += ("\t\tPlayerPalette: omarchy-player\n"
+                          "\tWithDeathAnimation:\n\t\tDeathSequencePalette: omarchy-player\n")
         if actor in roster.SPEED_TWEAKS:
             block += f"\tMobile:\n\t\tSpeed: {roster.SPEED_TWEAKS[actor]}\n"
         if actor in roster.OMARCHY_POWERS:
@@ -140,15 +183,19 @@ Actors:
         out.append(f"\tMine{index}: mine\n\t\tOwner: Neutral\n\t\tLocation: {x},{y}\n")
     for index, (x, y) in enumerate(trees):
         out.append(f"\tTree{index}: t01\n\t\tOwner: Neutral\n\t\tLocation: {x},{y}\n")
+    for index, (actor, x, y) in enumerate(scenery()[0]):
+        out.append(f"\tVillage{index}: {actor}\n\t\tOwner: Neutral\n\t\tLocation: {x},{y}\n")
     out.append("\nRules: rules.yaml\nSequences: sequences.yaml\nFluentMessages: omarchy.ftl\n")
     return "".join(out)
 
 
 def write_bin(path, resources):
     result = bytearray(struct.pack("<BHHIII", 2, SIZE, SIZE, 17, 0, 17 + 3 * SIZE * SIZE))
+    _, rocks, rough = scenery()
     for x in range(SIZE):
         for y in range(SIZE):
-            result.extend(struct.pack("<HB", 255, x % 4 + y % 4 * 4))
+            tile = (216, 0) if (x, y) in rocks else (580, 0) if (x, y) in rough else (255, x % 4 + y % 4 * 4)
+            result.extend(struct.pack("<HB", *tile))
     for x in range(SIZE):
         for y in range(SIZE):
             result.extend(bytes(resources.get((x, y), (0, 0))))
@@ -169,21 +216,29 @@ def generate(output):
         cells[cell] = (148, 128, 96)
     for x, y in trees:
         cells[x, y + 1] = (28, 32, 36)
+    buildings, rocks, rough = scenery()
+    for cell in rough:
+        cells[cell] = (90, 83, 65)
+    for cell in rocks:
+        cells[cell] = (91, 95, 102)
+    for _, x, y in buildings:
+        for dx in range(2):
+            for dy in range(2):
+                cells[x + dx, y + dy] = (190, 181, 158)
     for (x, y), colour in zip(SPAWNS, ((158, 206, 106), (247, 118, 142))):
         for dx in range(-2, 3):
             for dy in range(-2, 3):
                 cells[x + dx, y + dy] = colour
     build_art.build_preview(output / "map.png", cells, BOUNDS, scale=4, logo_px=48)
+    build_skirmish_art.build(output)
 
 
 def package(output, destination):
-    source = ROOT / "omarchy-edition"
-    assets = sorted(source.glob("*.shp"))
-    if not assets or not (source / "sequences.yaml").is_file():
-        raise SystemExit("Missing committed artwork. Use a complete repository checkout.")
-    for asset in assets + [source / "sequences.yaml"]:
-        shutil.copyfile(asset, output / asset.name)
-    allowed = {"map.yaml", "map.bin", "map.png", "rules.yaml", "sequences.yaml", "omarchy.ftl"}
+    assets = [output / f"{side}-{actor}-icon.shp" for side, actor in build_skirmish_art.icon_images()]
+    assets += [output / f"{side}-yard.shp" for side in ("omarchy", "commie")]
+    if not assets or not (output / "sequences.yaml").is_file():
+        raise SystemExit("Build the original artwork before packaging.")
+    allowed = {"map.yaml", "map.bin", "map.png", "rules.yaml", "sequences.yaml", "omarchy.ftl", "omarchy-art.pal"}
     allowed.update(asset.name for asset in assets)
     with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name in sorted(allowed):
@@ -196,7 +251,7 @@ def package(output, destination):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build" / "omarchy-skirmish")
-    parser.add_argument("--generate-only", action="store_true", help="Generate terrain/rules without copying committed artwork")
+    parser.add_argument("--generate-only", action="store_true", help="Generate terrain, rules and artwork without the final archive")
     args = parser.parse_args()
     generate(args.output)
     if not args.generate_only:

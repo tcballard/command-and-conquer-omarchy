@@ -15,19 +15,15 @@ Install OpenRA and its Red Alert content first. In a complete checkout:
 
 ```sh
 sudo pacman -S --needed openra python-pillow
-python tools/build_skirmish.py
+sh tools/install_skirmish.sh
 ```
 
-Copy `build/omarchy-skirmish.oramap` into your OpenRA map directory. For a
-normal current installation:
+The installer builds and copies the map into your user-local OpenRA map
+directory, including the legacy `~/.openra` location when present. It does
+not modify the game installation. For a custom location:
 
 ```sh
-map_dir="${XDG_CONFIG_HOME:-$HOME/.config}/openra/maps/ra/release-20250330"
-if [ -d "$HOME/.openra" ]; then
-  map_dir="$HOME/.openra/maps/ra/release-20250330"
-fi
-mkdir -p "$map_dir"
-cp build/omarchy-skirmish.oramap "$map_dir/"
+sh tools/install_skirmish.sh --dest /path/to/openra/maps/ra/release-20250330
 ```
 
 Restart OpenRA Red Alert, open **Singleplayer → Skirmish**, and select
@@ -43,36 +39,50 @@ not required for this OpenRA map.
 
 ## What carries over
 
-- The roster, humour, Omarchy colours, logo preview and 43 custom sidebar icons.
+- The roster, humour, Omarchy colours and logo preview. Both factions now
+  have their own terminal-style sidebar icons, selected by the producing
+  factory's faction, including shared units.
 - Standard Red Alert economy, build prerequisites and bot modules. Shared
   units keep their original actor IDs so AI production, harvesting, MCV
   deployment and captured factories still use the stock rules.
-- Shared units get faction-dependent names on the battlefield. The shared
-  build-menu names, descriptions and icons currently use the Omarchian
-  version on both sides; a fully separate Soviet palette is future work.
+- Shared units get faction-dependent names on the battlefield. Shared
+  build-menu tooltip names/descriptions still use the Omarchian version on
+  both sides; the icons themselves now show the correct faction names.
 - A larger, rotationally symmetric battlefield, six regenerating ore mines
-  and open ground between bases. No prebuilt campaign bases or free waves.
+  and open ground between bases. Rocky flanks, debris and a central village
+  add landmarks and obstacles without changing the equal starting economy.
+  No prebuilt campaign bases or free waves.
 
-The older mission remains in `omarchy-edition/` as the artwork source and
-an archive of the prototype. Its mission script is not included in this map.
+The older mission remains in `omarchy-edition/` as an archive of the prototype.
+Its mission script and old icon files are not included in this map.
 
-## Custom artwork next
+## Original construction yards
 
-Keep the small sprites readable and recognisably Red Alert. Suggested first
-set: an Omarchy construction yard, a terminal-inspired light tank, a coding
-agent aircraft and a DHH hero sprite. Each needs the actual in-game facing,
-animation and team-colour frames, not just a promotional illustration.
-The existing terminal-style build icons already give us a visual direction.
-New artwork should be original and its source/licence recorded with it.
+Both construction yards now use original sprites: a terminal workshop for
+the Omarchians and a bureaucratic industrial block for the Commies. Each has
+healthy/damaged art, a twelve-frame deployment reveal, a production pulse
+and a dissolving wreck. Roof accents use player colours, including after
+capture. These are simple first-pass animations; their fit against the
+stock terrain and bib still needs an in-game visual check.
+
+![Generated construction-yard preview, not gameplay](assets/previews/construction-yards.png)
+
+The source sheet, provenance and original prompt are in [assets/](assets/README.md).
+Rebuilding now generates all custom sprites, icons and the palette from our
+own sources. No extracted EA palette or separate font download is needed.
+The rest of the battlefield units still use stock artwork. A light tank,
+coding-agent aircraft and DHH hero are good next candidates.
 
 ## Validation
 
 `python -m unittest discover -s tests -v` checks equal starting resources,
 clear deployment areas, ground routes, binary resource placement, Fluent
-references and reproducible packaging with all referenced icons present.
+references, original sprite frames, player-colour indices and reproducible
+packaging with all referenced icons present.
 GitHub Actions additionally builds OpenRA `release-20250330` and runs the
 engine's YAML lint with warnings treated as errors. A passing run provides
-the installable `omarchy-skirmish` artifact.
+the installable `omarchy-skirmish` artifact. It also decodes all 68 yard
+frames through OpenRA's own sprite loader and publishes art previews.
 
 These are not playtest claims. Before calling this ready: play a complete
 match on the XPS, observe the AI deploy/build/harvest/attack, train DHH and

@@ -18,6 +18,11 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build skirmish
         run: python tools/build_skirmish.py
+      - name: Check user-local installer
+        run: |
+          sh -n tools/install_skirmish.sh
+          sh tools/install_skirmish.sh --dest "$RUNNER_TEMP/omarchy-test-maps"
+          cmp build/omarchy-skirmish.oramap "$RUNNER_TEMP/omarchy-test-maps/omarchy-skirmish.oramap"
       - uses: actions/checkout@v4
         with:
           repository: OpenRA/OpenRA
@@ -40,7 +45,23 @@ jobs:
         env:
           TREAT_WARNINGS_AS_ERRORS: 'true'
         run: ./utility.sh ra --check-yaml ../build/omarchy-skirmish.oramap
+      - name: Decode original sprites with OpenRA
+        working-directory: engine
+        run: |
+          ./utility.sh ra --png ../build/omarchy-skirmish/omarchy-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
+          ./utility.sh ra --png ../build/omarchy-skirmish/commie-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
+          test "$(find . -maxdepth 1 -name 'omarchy-yard-*.png' | wc -l)" -eq 34
+          test "$(find . -maxdepth 1 -name 'commie-yard-*.png' | wc -l)" -eq 34
       - uses: actions/upload-artifact@v4
         with:
           name: omarchy-skirmish
           path: build/omarchy-skirmish.oramap
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skirmish-art-previews
+          path: |
+            build/omarchy-skirmish/yard-preview.png
+            build/omarchy-skirmish/icon-preview.png
+            build/omarchy-skirmish/map.png
+            engine/omarchy-yard-*.png
+            engine/commie-yard-*.png
