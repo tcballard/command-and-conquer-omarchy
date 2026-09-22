@@ -2,7 +2,7 @@
 # Generated single-file installer. Run with bash, without sudo.
 set -euo pipefail
 expected_version=20250330
-map_sha='@MAP_SHA@'
+payload_sha='@MAP_SHA@'
 app_id=command-and-conquer-omarchy
 mode=install
 case "${1:-}" in
@@ -27,10 +27,13 @@ staging=$(mktemp -d)
 trap 'rm -rf -- "$staging"' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-sed '1,/^__OMARCHY_PAYLOAD__$/d' "$0" | base64 --decode > "$staging/map.oramap"
-printf '%s  %s\n' "$map_sha" "$staging/map.oramap" | sha256sum --check --status || {
+sed '1,/^__OMARCHY_PAYLOAD__$/d' "$0" | base64 --decode > "$staging/payload.tar.gz"
+printf '%s  %s\n' "$payload_sha" "$staging/payload.tar.gz" | sha256sum --check --status || {
   echo 'Installer payload is damaged. Download it again.' >&2; exit 1;
 }
+tar -xzf "$staging/payload.tar.gz" -C "$staging"
+map_sha=$(sha256sum "$staging/map.oramap")
+map_sha=${map_sha%% *}
 if ! pacman -Q openra >/dev/null 2>&1; then
   echo 'Installing OpenRA from your configured Arch repositories (sudo may ask for your password).'
   sudo pacman -S --needed openra
@@ -64,6 +67,18 @@ atomic_install() {
   rm -f -- "$tmp"
   return 1
 }
+# Only this app-owned mod directory is replaced; engine files are never patched.
+mkdir -p "$app_dir/mods" "$app_dir/support"
+openra_support=${map_dir%/maps/ra/*}
+mkdir -p "$openra_support/Content"
+if [[ ! -e "$app_dir/support/Content" && ! -L "$app_dir/support/Content" ]]; then
+  ln -s "$openra_support/Content" "$app_dir/support/Content"
+fi
+cp -a "$staging/mods/." "$app_dir/mods/"
+manifest=$(cat "$app_dir/mods/omarchy/mod.yaml.in")
+manifest=${manifest//@OMARCHY_DLL@/$app_dir/mods/omarchy/OpenRA.Mods.Omarchy.dll}
+printf '%s\n' "$manifest" > "$staging/mod.yaml"
+atomic_install "$staging/mod.yaml" "$app_dir/mods/omarchy/mod.yaml" 644
 atomic_install "$staging/map.oramap" "$map_path" 644
 printf '%s\n' "$map_sha" > "$app_dir/map-sha256"
 cat > "$staging/launch.sh" <<'LAUNCH'
@@ -76,7 +91,13 @@ if [[ ${version%-*} != 20250330 ]]; then
   if command -v zenity >/dev/null; then zenity --error --text="$message"; else echo "$message" >&2; fi
   exit 1
 fi
-exec openra-ra "$@"
+app_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+engine_dir=${OMARCHY_OPENRA_DIR:-/usr/lib/openra}
+cd "$engine_dir"
+exec "$engine_dir/OpenRA" "Game.Mod=$app_dir/mods/omarchy" \
+  "Engine.ModSearchPaths=$engine_dir/mods,$app_dir/mods" \
+  "Engine.LaunchPath=$app_dir/launch.sh" "Engine.SupportDir=$app_dir/support" \
+  Game.FetchNews=false Game.AllowDownloading=false Debug.CheckVersion=false "$@"
 LAUNCH
 atomic_install "$staging/launch.sh" "$app_dir/launch.sh" 755
 # Desktop Exec uses its own escaping, distinct from shell quoting.
@@ -115,6 +136,7 @@ if [[ -f "$app_dir/previous.oramap" ]]; then
   cp -p -- "$app_dir/previous.oramap" "$map_path"
 fi
 rm -f -- "$desktop" "$app_dir/launch.sh" "$app_dir/map-path" "$app_dir/map-sha256" "$app_dir/previous.oramap" "$app_dir/uninstall.sh"
+rm -rf -- "$app_dir/mods"
 rmdir -- "$app_dir" 2>/dev/null || true
 command -v update-desktop-database >/dev/null && update-desktop-database "$(dirname -- "$desktop")" || true
 echo 'Removed Omarchy Edition. OpenRA, its content, saves and other maps were kept.'
@@ -124,7 +146,7 @@ atomic_install "$staging/uninstall.sh" "$app_dir/uninstall.sh" 755
 command -v update-desktop-database >/dev/null && update-desktop-database "$applications" || true
 echo 'Installed Command & Conquer: Omarchy Edition in your app menu.'
 echo 'First launch: let OpenRA install Red Alert content if prompted.'
-echo 'Then choose Singleplayer → Skirmish → Omarchy Skirmish - Package Conflict.'
+echo 'Omarchy opens directly into the Package Conflict skirmish lobby.'
 echo 'Take the green slot and add Normal AI to the pink Walled Garden slot.'
 printf 'Uninstall: bash %q\n' "$app_dir/uninstall.sh"
 if [[ $mode == install ]]; then

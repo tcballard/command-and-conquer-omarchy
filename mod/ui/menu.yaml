@@ -1,0 +1,41 @@
+Container@OMARCHY_MENU:
+	Logic: OmarchyMenuLogic
+	Children:
+		Background@PANEL:
+			X: (WINDOW_WIDTH - WIDTH) / 2
+			Y: (WINDOW_HEIGHT - HEIGHT) / 2
+			Width: 420
+			Height: 280
+			Children:
+				Label@TITLE:
+					Y: 25
+					Width: PARENT_WIDTH
+					Height: 30
+					Align: Center
+					Font: BigBold
+					Text: omarchy-menu-title
+				Label@SUBTITLE:
+					Y: 62
+					Width: PARENT_WIDTH
+					Height: 25
+					Align: Center
+					Text: omarchy-menu-subtitle
+				Button@SKIRMISH:
+					X: (PARENT_WIDTH - WIDTH) / 2
+					Y: 105
+					Width: 230
+					Height: 35
+					Font: Bold
+					Text: omarchy-menu-skirmish
+				Button@SETTINGS:
+					X: (PARENT_WIDTH - WIDTH) / 2
+					Y: 150
+					Width: 230
+					Height: 35
+					Text: button-settings-title
+				Button@QUIT:
+					X: (PARENT_WIDTH - WIDTH) / 2
+					Y: 195
+					Width: 230
+					Height: 35
+					Text: button-quit

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <EngineDir Condition="'$(EngineDir)' == ''">../../../engine/bin</EngineDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenRA.Game"><HintPath>$(EngineDir)/OpenRA.Game.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="OpenRA.Mods.Common"><HintPath>$(EngineDir)/OpenRA.Mods.Common.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

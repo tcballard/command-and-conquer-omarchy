@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Build an isolated Omarchy mod using the pinned OpenRA manifest and our map."""
+import argparse
+from pathlib import Path
+import shutil
+import zipfile
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def build(engine, dll, output):
+    output.mkdir(parents=True, exist_ok=True)
+    mod = output / 'omarchy'
+    content = output / 'omarchy-content'
+    mod.mkdir(exist_ok=True)
+    content.mkdir(exist_ok=True)
+    original = (engine / 'mods/ra/mod.yaml').read_text()
+    # Upstream source tags have a development token; installed releases substitute it.
+    manifest = original.replace('{DEV_VERSION}', 'release-20250330')
+    manifest = manifest.replace('Title: mod-title', 'Title: omarchy-mod-title')
+    manifest = manifest.replace('WindowTitle: mod-windowtitle', 'WindowTitle: omarchy-window-title')
+    manifest = manifest.replace('\t\t$ra: ra', '\t\t$ra: ra\n\t\t$omarchy: omarchy')
+    manifest = manifest.replace('ContentInstallerMod: ra-content', 'ContentInstallerMod: omarchy-content')
+    begin = manifest.index('MapFolders:')
+    end = manifest.index('\nRules:', begin)
+    manifest = manifest[:begin] + 'MapFolders:\n\tomarchy|maps: System\n' + manifest[end:]
+    manifest = manifest.replace('\tra|rules/fakes.yaml', '\tra|rules/fakes.yaml\n\tomarchy|rules.yaml')
+    manifest = manifest.replace('Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Cnc.dll',
+                                'Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Cnc.dll, @OMARCHY_DLL@')
+    manifest = manifest.replace('\tcommon|chrome/mainmenu.yaml', '\tomarchy|menu.yaml')
+    manifest = manifest.replace('\tra|fluent/rules.ftl', '\tra|fluent/rules.ftl\n\tomarchy|messages.ftl')
+    manifest = manifest.replace('Missions:\n\tra|missions.yaml', 'Missions:')
+    manifest = manifest.replace('SupportsMapsFrom: ra', 'SupportsMapsFrom: omarchy')
+    # Stock strings for omitted UI are allowed in the shared upstream packages.
+    manifest = manifest.replace('AllowUnusedFluentMessagesInExternalPackages: false',
+                                'AllowUnusedFluentMessagesInExternalPackages: true')
+    (mod / 'mod.yaml.in').write_text(manifest)
+    # A build-local manifest is usable directly by OpenRA Utility.
+    (mod / 'mod.yaml').write_text(manifest.replace('@OMARCHY_DLL@', str((mod / dll.name).resolve())))
+    shutil.copyfile(dll, mod / dll.name)
+    for path in (ROOT / 'mod/ui').iterdir():
+        shutil.copyfile(path, mod / path.name)
+    # Reuse the stock content downloader, but return to Omarchy when it finishes.
+    content_manifest = (engine / 'mods/ra-content/mod.yaml').read_text()
+    content_manifest = content_manifest.replace('{DEV_VERSION}', 'release-20250330').replace('\tMod: ra\n', '\tMod: omarchy\n')
+    (content / 'mod.yaml').write_text(content_manifest)
+    shutil.copyfile(engine / 'COPYING', mod / 'COPYING.OpenRA')
+    (mod / 'SOURCE.txt').write_text('OpenRA manifest/content configuration: https://github.com/OpenRA/OpenRA/tree/release-20250330 (GPL-3.0-or-later).\nCustom menu source: https://github.com/tcballard/command-and-conquer-omarchy/tree/codex/omarchy-skirmish/mod (GPL-3.0-or-later).\n')
+    maps = mod / 'maps'
+    maps.mkdir(exist_ok=True)
+    battle = maps / 'package-conflict.oramap'
+    with zipfile.ZipFile(ROOT / 'build/omarchy-skirmish.oramap') as src, zipfile.ZipFile(battle, 'w', zipfile.ZIP_DEFLATED) as dst:
+        for name in src.namelist():
+            data = src.read(name)
+            if name == 'map.yaml':
+                data = data.replace(b'RequiresMod: ra', b'RequiresMod: omarchy')
+            item = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
+            item.compress_type = zipfile.ZIP_DEFLATED
+            dst.writestr(item, data)
+        terrain = src.read('map.bin')
+    # A quiet backdrop made from our own map terrain. Never offered as a match.
+    shell_yaml = '''MapFormat: 12
+RequiresMod: omarchy
+Title: Omarchy Backdrop
+Author: Omarchy Edition
+Tileset: TEMPERAT
+MapSize: 96,96
+Bounds: 2,2,92,92
+Visibility: Shellmap
+Categories: Shellmap
+Players:
+\tPlayerReference@Neutral:
+\t\tName: Neutral
+\t\tOwnsWorld: True
+\t\tNonCombatant: True
+\t\tFaction: allies
+\tPlayerReference@Creeps:
+\t\tName: Creeps
+\t\tNonCombatant: True
+\t\tFaction: allies
+Actors:
+'''
+    with zipfile.ZipFile(maps / 'backdrop.oramap', 'w', zipfile.ZIP_DEFLATED) as dst:
+        for name, data in [('map.yaml', shell_yaml.encode()), ('map.bin', terrain)]:
+            item = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
+            item.compress_type = zipfile.ZIP_DEFLATED
+            dst.writestr(item, data)
+    return mod
+
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('engine', type=Path)
+    p.add_argument('dll', type=Path)
+    p.add_argument('--output', type=Path, default=ROOT / 'build/mods')
+    a = p.parse_args()
+    print(build(a.engine, a.dll, a.output))

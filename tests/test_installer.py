@@ -39,9 +39,18 @@ fi''')
         self.mock('sudo', 'exec "$@"')
         self.mock('openra-ra', 'printf "launch\\n" >> "$CALLS"')
         self.mock('update-desktop-database', 'exit 0')
+        self.engine = self.root / 'engine'
+        self.engine.mkdir()
+        (self.engine / 'OpenRA').write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$CALLS.args"\nprintf "launch\\n" >> "$CALLS"\n')
+        (self.engine / 'OpenRA').chmod(0o755)
+        self.env['OMARCHY_OPENRA_DIR'] = str(self.engine)
+        self.mods = self.root / 'mods'
+        (self.mods / 'omarchy').mkdir(parents=True)
+        (self.mods / 'omarchy/OpenRA.Mods.Omarchy.dll').write_bytes(b'mocked assembly')
+        (self.mods / 'omarchy/mod.yaml.in').write_text('Assemblies: @OMARCHY_DLL@\n')
         self.payload = self.root / 'map.oramap'
         self.payload.write_bytes(b'custom map test fixture\x00\xff')
-        self.installer = build(self.payload, self.root / 'installer.sh')
+        self.installer = build(self.payload, self.root / 'installer.sh', self.mods)
         self.app = self.home / 'data/command-and-conquer-omarchy'
         self.map = self.home / 'config/openra/maps/ra/release-20250330/omarchy-skirmish.oramap'
         self.desktop = self.home / 'data/applications/command-and-conquer-omarchy.desktop'
@@ -66,6 +75,10 @@ fi''')
         other.write_text('save')
         self.run_installer()
         self.assertEqual(self.map.read_bytes(), self.payload.read_bytes())
+        args = Path(str(self.calls) + '.args').read_text()
+        self.assertIn('Game.Mod=' + str(self.app / 'mods/omarchy'), args)
+        self.assertIn('Game.AllowDownloading=false', args)
+        self.assertNotIn('@OMARCHY_DLL@', (self.app / 'mods/omarchy/mod.yaml').read_text())
         self.assertIn('Name=Command & Conquer: Omarchy Edition', self.desktop.read_text())
         self.assertEqual(self.calls.read_text().splitlines(), ['-S --needed openra', 'launch'])
         self.run_installer('--no-launch')
@@ -105,7 +118,7 @@ fi''')
 
     def test_corruption_fails_before_package_install_and_build_is_reproducible(self):
         before = self.installer.read_bytes()
-        build(self.payload, self.installer)
+        build(self.payload, self.installer, self.mods)
         self.assertEqual(before, self.installer.read_bytes())
         header, data = before.split(b'__OMARCHY_PAYLOAD__\n')
         self.installer.write_bytes(header + b'A' + data[1:])

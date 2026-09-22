@@ -18,12 +18,6 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build skirmish
         run: python tools/build_skirmish.py
-      - name: Build single-file installer
-        run: |
-          python tools/build_installer.py
-          bash -n packaging/install.sh.in
-          bash -n build/install-omarchy-edition.sh
-          cd build && sha256sum --check install-omarchy-edition.sh.sha256
       - name: Check user-local installer
         run: |
           sh -n tools/install_skirmish.sh
@@ -47,6 +41,24 @@ jobs:
         run: |
           dotnet build -c Release -p:TargetPlatform=unix-generic
           ./configure-system-libraries.sh
+      - name: Build the dedicated Omarchy mod and menu
+        run: |
+          dotnet build mod/OpenRA.Mods.Omarchy -c Release -p:EngineDir="$GITHUB_WORKSPACE/engine/bin" -o build/menu
+          python tools/build_omarchy_mod.py engine build/menu/OpenRA.Mods.Omarchy.dll
+      - name: Validate Omarchy-only menus and map catalog
+        working-directory: engine
+        env:
+          TREAT_WARNINGS_AS_ERRORS: 'true'
+        run: |
+          export MOD_SEARCH_PATHS="$GITHUB_WORKSPACE/engine/mods,$GITHUB_WORKSPACE/build/mods"
+          ./utility.sh omarchy --check-omarchy
+          ./utility.sh omarchy --check-yaml
+      - name: Build single-file installer
+        run: |
+          python tools/build_installer.py
+          bash -n packaging/install.sh.in
+          bash -n build/install-omarchy-edition.sh
+          cd build && sha256sum --check install-omarchy-edition.sh.sha256
       - name: Lint packaged skirmish against OpenRA
         working-directory: engine
         env:
@@ -84,12 +96,12 @@ jobs:
         with:
           name: omarchy-skirmish
           path: preview
-      - name: Publish first installer preview
+      - name: Publish Omarchy-only installer preview
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag=v0.0.1-preview.1
+          tag=v0.0.1-preview.2
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Preview already exists; leaving its assets untouched."
             exit 0
@@ -102,5 +114,5 @@ jobs:
             preview/install-omarchy-edition.sh.sha256 \
             preview/omarchy-skirmish.oramap \
             --target "$GITHUB_SHA" --prerelease \
-            --title 'Omarchy Edition — first skirmish preview' \
+            --title 'Omarchy Edition — Omarchy-only skirmish preview' \
             --notes-file packaging/PREVIEW-NOTES.md

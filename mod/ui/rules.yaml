@@ -1,0 +1,3 @@
+World:
+	LoadWidgetAtGameStart:
+		ShellmapRoot: OMARCHY_MENU

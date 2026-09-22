@@ -7,7 +7,7 @@ skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.1/install-omarchy-edition.sh)** from the preview release,
+Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.2/install-omarchy-edition.sh)** from the preview release,
 then run it as your normal user:
 
 ```sh
@@ -21,7 +21,10 @@ menu. No Git, Python or source checkout is needed. Internet and sudo are only
 needed for installing the OpenRA package; OpenRA may also download its Red
 Alert content on first launch. Complete that content setup when prompted.
 The installer does not bundle the original game files or automatically start
-a match. It opens OpenRA Red Alert, where you select the skirmish below.
+a match. It opens the dedicated Omarchy lobby directly. There is one playable
+map and no map-change button, campaign browser, multiplayer browser or editor
+entry point. Leaving the lobby shows Skirmish, Settings and Quit. The standard
+OpenRA launcher remains available separately.
 
 Run the same installer again to update its map. Use `--no-launch` to install
 without opening the game. A different OpenRA release is rejected without
@@ -39,13 +42,22 @@ Or run `bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/u
 Removal keeps OpenRA, downloaded content, saves and other maps. If this
 installer replaced an earlier Package Conflict map, that copy is restored.
 If you have edited the installed map, removal stops and preserves it; move
-that file aside before retrying. Both XDG and legacy `~/.openra` paths work.
+that file aside before retrying. Both XDG and legacy `~/.openra` paths work. The dedicated mod keeps its own
+settings, saves and replays under the app's `support` directory and shares
+only the existing Red Alert content directory. Uninstall preserves that
+support directory. This is a focused launcher, not a restriction on what
+you can do with a separately launched OpenRA or edited source code.
 
 ### Build from source
 
 ```sh
 sudo pacman -S --needed python python-pillow
 python tools/build_skirmish.py
+# Requires the pinned OpenRA source and its build toolchain:
+git clone --branch release-20250330 --depth 1 https://github.com/OpenRA/OpenRA.git engine
+(cd engine && dotnet build -c Release -p:TargetPlatform=unix-generic)
+dotnet build mod/OpenRA.Mods.Omarchy -c Release -p:EngineDir="$PWD/engine/bin" -o build/menu
+python tools/build_omarchy_mod.py engine build/menu/OpenRA.Mods.Omarchy.dll
 python tools/build_installer.py
 bash build/install-omarchy-edition.sh
 ```
@@ -55,8 +67,8 @@ the same map and installer source. The checksum detects download damage;
 it is not a publisher signature. The older map-only developer installer
 remains available: `sh tools/install_skirmish.sh [--dest MAP_DIRECTORY]`.
 
-Restart OpenRA Red Alert, choose **Singleplayer → Skirmish**, and select
-**Omarchy Skirmish - Package Conflict**. Take the green Omarchian slot and
+Launch **Command & Conquer: Omarchy Edition** from your app menu.
+**Package Conflict** opens directly in the skirmish lobby. Take the green Omarchian slot and
 put **Normal AI** in the pink Walled Garden slot. Both slots must be occupied.
 Default cash is $10,000 with Light Support starting units. Rush and Turtle
 AI also work with the map rules; avoid Naval AI on this land map. Two humans
