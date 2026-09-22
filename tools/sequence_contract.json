@@ -1,0 +1,859 @@
+{
+  "fcom": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib"
+  ],
+  "hosp": [
+    "idle",
+    "damaged-idle",
+    "dead",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "bio": [
+    "idle",
+    "damaged-idle",
+    "dead",
+    "make"
+  ],
+  "oilb": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib"
+  ],
+  "fact": [
+    "idle",
+    "make",
+    "build",
+    "damaged-idle",
+    "damaged-build",
+    "dead",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "proc": [
+    "idle",
+    "damaged-idle",
+    "idle-top",
+    "damaged-idle-top",
+    "make",
+    "dead",
+    "bib",
+    "icon"
+  ],
+  "silo": [
+    "idle",
+    "damaged-idle",
+    "stages",
+    "damaged-stages",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "powr": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "dead",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "apwr": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "dead",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "barr": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "tent": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "kenn": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "dome": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "atek": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "active",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "stek": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "weap": [
+    "idle",
+    "damaged-idle",
+    "place",
+    "make",
+    "build-top",
+    "damaged-build-top",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "hpad": [
+    "idle",
+    "damaged-idle",
+    "active",
+    "damaged-active",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "afld": [
+    "idle",
+    "damaged-idle",
+    "active",
+    "damaged-active",
+    "make",
+    "icon"
+  ],
+  "spen": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "icon",
+    "fake-icon"
+  ],
+  "syrd": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "icon",
+    "fake-icon"
+  ],
+  "fix": [
+    "idle",
+    "damaged-idle",
+    "active",
+    "damaged-active",
+    "make",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "gun": [
+    "idle",
+    "make",
+    "turret",
+    "recoil",
+    "damaged-turret",
+    "damaged-recoil",
+    "muzzle",
+    "bib",
+    "icon"
+  ],
+  "agun": [
+    "idle",
+    "make",
+    "turret",
+    "recoil",
+    "damaged-turret",
+    "damaged-recoil",
+    "muzzle",
+    "bib",
+    "icon"
+  ],
+  "sam": [
+    "idle",
+    "turret",
+    "damaged-turret",
+    "make",
+    "muzzle",
+    "bib",
+    "icon"
+  ],
+  "ftur": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "tsla": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "active",
+    "damaged-active",
+    "bib",
+    "icon"
+  ],
+  "pbox": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "muzzle",
+    "bib",
+    "icon"
+  ],
+  "hbox": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "muzzle",
+    "icon"
+  ],
+  "gap": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "iron": [
+    "idle",
+    "active",
+    "damaged-idle",
+    "damaged-active",
+    "make",
+    "bib",
+    "icon"
+  ],
+  "pdox": [
+    "idle",
+    "damaged-idle",
+    "active",
+    "damaged-active",
+    "make",
+    "bib",
+    "icon",
+    "fake-icon"
+  ],
+  "mslo": [
+    "idle",
+    "damaged-idle",
+    "make",
+    "active",
+    "damaged-active",
+    "icon",
+    "fake-icon"
+  ],
+  "miss": [
+    "idle",
+    "damaged-idle",
+    "dead",
+    "make",
+    "bib"
+  ],
+  "brik": [
+    "idle",
+    "scratched-idle",
+    "damaged-idle",
+    "icon"
+  ],
+  "sbag": [
+    "idle",
+    "icon"
+  ],
+  "fenc": [
+    "idle",
+    "icon"
+  ],
+  "cycl": [
+    "idle",
+    "damaged-idle"
+  ],
+  "mcv": [
+    "idle",
+    "icon"
+  ],
+  "mcvhusk": [
+    "idle"
+  ],
+  "truk": [
+    "idle",
+    "icon"
+  ],
+  "harv": [
+    "idle",
+    "harvest",
+    "dock",
+    "dock-loop",
+    "icon"
+  ],
+  "harvempty": [],
+  "harvhalf": [],
+  "hhusk": [
+    "idle"
+  ],
+  "hhusk2": [
+    "idle"
+  ],
+  "1tnk": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "1tnk.destroyed": [
+    "idle",
+    "turret"
+  ],
+  "2tnk": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "2tnk.destroyed": [
+    "idle",
+    "turret"
+  ],
+  "3tnk": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "3tnk.destroyed": [
+    "idle",
+    "turret"
+  ],
+  "4tnk": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "4tnk.destroyed": [
+    "idle",
+    "turret"
+  ],
+  "v2rl": [
+    "idle",
+    "empty-idle",
+    "icon"
+  ],
+  "arty": [
+    "idle",
+    "muzzle",
+    "icon"
+  ],
+  "jeep": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "apc": [
+    "idle",
+    "muzzle",
+    "open",
+    "unload",
+    "icon"
+  ],
+  "mnly": [
+    "idle",
+    "icon"
+  ],
+  "mrj": [
+    "idle",
+    "spinner",
+    "icon"
+  ],
+  "mgg": [
+    "idle",
+    "spinner",
+    "spinner-idle",
+    "icon"
+  ],
+  "mgg.destroyed": [
+    "idle",
+    "spinner",
+    "spinner-idle"
+  ],
+  "ttnk": [
+    "idle",
+    "spinner",
+    "icon"
+  ],
+  "ftrk": [
+    "idle",
+    "turret",
+    "muzzle",
+    "icon"
+  ],
+  "dtrk": [
+    "idle",
+    "icon"
+  ],
+  "ctnk": [
+    "idle",
+    "muzzle",
+    "icon"
+  ],
+  "qtnk": [
+    "idle",
+    "piston",
+    "icon"
+  ],
+  "stnk": [
+    "idle",
+    "turret",
+    "icon"
+  ],
+  "mig": [
+    "idle",
+    "icon"
+  ],
+  "yak": [
+    "idle",
+    "muzzle",
+    "icon"
+  ],
+  "heli": [
+    "idle",
+    "rotor",
+    "slow-rotor",
+    "icon"
+  ],
+  "hind": [
+    "idle",
+    "rotor",
+    "slow-rotor",
+    "muzzle",
+    "icon"
+  ],
+  "tran": [
+    "idle",
+    "rotor",
+    "rotor2",
+    "slow-rotor",
+    "slow-rotor2",
+    "open",
+    "unload",
+    "icon"
+  ],
+  "tran1husk": [
+    "idle"
+  ],
+  "tran2husk": [
+    "idle"
+  ],
+  "u2": [
+    "idle"
+  ],
+  "badr": [
+    "idle"
+  ],
+  "mh60": [
+    "idle",
+    "rotor",
+    "slow-rotor",
+    "muzzle",
+    "icon"
+  ],
+  "e1": [
+    "stand",
+    "stand2",
+    "run",
+    "shoot",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "liedown",
+    "standup",
+    "prone-shoot",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "garrison-muzzle",
+    "icon"
+  ],
+  "e3": [
+    "stand",
+    "stand2",
+    "run",
+    "shoot",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "prone-shoot",
+    "icon"
+  ],
+  "e6": [
+    "stand",
+    "stand2",
+    "run",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "icon"
+  ],
+  "medi": [
+    "stand",
+    "run",
+    "heal",
+    "standup",
+    "idle",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-run",
+    "icon"
+  ],
+  "mech": [
+    "stand",
+    "run",
+    "repair",
+    "standup",
+    "idle",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-run",
+    "icon"
+  ],
+  "e2": [
+    "stand",
+    "stand2",
+    "run",
+    "throw",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "prone-throw",
+    "icon"
+  ],
+  "dog": [
+    "stand",
+    "walk",
+    "run",
+    "eat",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "jump",
+    "icon"
+  ],
+  "spy": [
+    "stand",
+    "stand2",
+    "run",
+    "shoot",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "prone-shoot",
+    "icon"
+  ],
+  "thf": [
+    "stand",
+    "run",
+    "idle",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-run",
+    "icon"
+  ],
+  "e7": [
+    "stand",
+    "run",
+    "shoot-left",
+    "shoot-right",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-run",
+    "prone-shoot-left",
+    "prone-shoot-right",
+    "garrison-muzzle",
+    "icon"
+  ],
+  "e4": [
+    "stand",
+    "stand2",
+    "run",
+    "shoot",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "prone-shoot",
+    "icon"
+  ],
+  "gnrl": [
+    "stand",
+    "run",
+    "shoot",
+    "prone-stand",
+    "prone-run",
+    "standup",
+    "prone-shoot",
+    "idle1",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed"
+  ],
+  "shok": [
+    "stand",
+    "stand2",
+    "run",
+    "shoot",
+    "prone-stand",
+    "prone-stand2",
+    "prone-run",
+    "liedown",
+    "standup",
+    "prone-shoot",
+    "parachute",
+    "idle1",
+    "idle2",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "icon"
+  ],
+  "c1": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "shoot",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "run"
+  ],
+  "c2": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "shoot",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "run"
+  ],
+  "c11": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "shoot",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "run"
+  ],
+  "einstein": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "run",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed"
+  ],
+  "delphi": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "run",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed"
+  ],
+  "chan": [
+    "stand",
+    "panic-stand",
+    "panic-run",
+    "run",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed"
+  ],
+  "zombie": [
+    "stand",
+    "stand2",
+    "run",
+    "bite",
+    "idle1",
+    "die1",
+    "die2",
+    "die3",
+    "die4",
+    "die5",
+    "die6",
+    "die-crushed",
+    "icon"
+  ],
+  "ant": [
+    "stand",
+    "run",
+    "bite",
+    "die",
+    "die-crushed",
+    "icon"
+  ],
+  "fireant": [
+    "stand",
+    "run",
+    "bite",
+    "die",
+    "die-crushed",
+    "icon"
+  ],
+  "scoutant": [
+    "stand",
+    "run",
+    "bite",
+    "die",
+    "die-crushed",
+    "icon"
+  ]
+}

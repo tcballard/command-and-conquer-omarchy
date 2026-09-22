@@ -1,47 +1,36 @@
 # Command & Conquer: Omarchy Edition
 
-Build the ISO. Harvest packages. Send DHH and the coding agents to deal
-with the Central Planning Compositor.
+Build the ISO. Harvest packages. Send DHH and the coding agents into battle.
 
-An Omarchy-themed **OpenRA Red Alert skirmish**, built for fun: green
-Omarchians against the Commies, terminal-style build icons, and a roster
-of familiar desktop tools with rather more firepower.
+An Omarchy-themed **OpenRA Red Alert skirmish**, built for fun. The green
+Omarchians face **The Walled Garden**: Bloatware tanks, Forced Update jets,
+Telemetry, and a particularly aggressive Antivirus.
 
-The new **Package Conflict** map gives both sides room to build, equal ore
-fields and normal skirmish AI. No scripted waves or campaign countdown.
-It is the next playable prototype; a full match on the XPS is still needed
-to check the balance and presentation.
+**Package Conflict** gives both sides room to build, equal ore fields and
+normal skirmish AI. No scripted waves or campaign countdown.
 
-**[Build and play the skirmish →](SKIRMISH.md)**
+**[Install and play →](SKIRMISH.md)**
 
-Requires OpenRA Red Alert `release-20250330` and its game content. This
-uses the original Red Alert foundation, not Red Alert 2 or Yuri's Revenge.
+## A custom army on both sides
 
-## Original artwork
+![Custom roster asset preview; not an in-game screenshot](assets/previews/roster.png)
 
-![Original construction yards: healthy and damaged for each faction](assets/previews/construction-yards.png)
+Original building, vehicle, aircraft and infantry artwork, illustrated build
+icons, rotating tank turrets, aircraft rotors, damage states and matching
+wrecks. The coding-agent helicopters and long-haired DHH are in the build.
+Animations are a first pass; a complete XPS match still needs to verify the
+presentation and balance.
 
-Both factions have original construction-yard sprites and their own build
-icons. The image above is an asset preview, not a gameplay screenshot.
-The remaining units and buildings still use stock Red Alert artwork.
-
-## Earlier in-game screenshots
-
-These screenshots are from the earlier mission prototype. They show the
-shared roster and custom icons, not the new skirmish battlefield.
-
-| | |
-|---|---|
-| ![Omarchian base in the mission prototype](screenshots/01-omarchian-base.png) | ![Themed build menu in the mission prototype](screenshots/12-agent-terminal-build-tooltip.png) |
+Requires OpenRA Red Alert `release-20250330` and its game content. Terrain,
+sound, projectiles and the underlying game still use the Red Alert foundation.
+This is not Red Alert 2 or Yuri's Revenge.
 
 ## Make it yours
 
-`tools/roster.py` holds the names and descriptions. `tools/build_skirmish.py`
-builds the map and original artwork with Python and Pillow.
-`sh tools/install_skirmish.sh` builds and installs it for your current user.
-Artwork sources and provenance live in [assets/](assets/README.md).
+Names live in `tools/skirmish_roster.py`. The [art sources](assets/README.md)
+and sprite compiler are included, so everything can be rebuilt with Python
+and Pillow. Run `sh tools/install_skirmish.sh` from a complete checkout.
 
-The earlier mission and its original build tools remain in `omarchy-edition/`;
-[INSTALL.md](INSTALL.md) covers that archived prototype and
-[NOTES.md](NOTES.md) records its development history. Current skirmish scope
-and testing limits are in [SKIRMISH.md](SKIRMISH.md).
+The earlier mission remains archived in `omarchy-edition/`.
+[INSTALL.md](INSTALL.md) and [NOTES.md](NOTES.md) describe that prototype;
+[SKIRMISH.md](SKIRMISH.md) describes the current game and its testing limits.

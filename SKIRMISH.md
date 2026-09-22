@@ -1,90 +1,94 @@
 # Omarchy Skirmish
 
-Build your base. Harvest packages. Send the coding agents in.
-
-**Package Conflict** is a two-player land skirmish for stock OpenRA Red Alert
-`release-20250330`. Play the green Omarchians against a Soviet AI opponent,
-with the existing Omarchy roster and custom sidebar icons. DHH is trainable
-from the barracks once you have Neovim, using Tanya's normal cost and one-unit
-limit. There are no scripted waves, mission objectives or Five-Year Plan
-deadline. The normal skirmish victory rules apply.
+**Package Conflict** is a two-player land skirmish for OpenRA Red Alert
+`release-20250330`: Omarchians versus **The Walled Garden**.
+Build a base, harvest, train DHH and launch the coding agents. Normal
+skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Install OpenRA and its Red Alert content first. In a complete checkout:
+Install OpenRA and its Red Alert content. From a complete checkout of the
+`codex/omarchy-skirmish` branch:
 
 ```sh
 sudo pacman -S --needed openra python-pillow
 sh tools/install_skirmish.sh
 ```
 
-The installer builds and copies the map into your user-local OpenRA map
-directory, including the legacy `~/.openra` location when present. It does
-not modify the game installation. For a custom location:
+The installer builds and atomically installs the map for your current user.
+It supports the legacy `~/.openra` directory too. For a custom location:
 
 ```sh
 sh tools/install_skirmish.sh --dest /path/to/openra/maps/ra/release-20250330
 ```
 
-Restart OpenRA Red Alert, open **Singleplayer → Skirmish**, and select
-**Omarchy Skirmish - Package Conflict**. Take the first (green Omarchian)
-slot and put **Normal AI** in the second (pink Commie) slot. Both slots
-must be occupied. Starting cash defaults to $10,000 and starting units to
-Light Support; both remain adjustable. Rush AI and Turtle AI are also
-available. Avoid Naval AI on this land map.
+Restart OpenRA Red Alert, choose **Singleplayer → Skirmish**, and select
+**Omarchy Skirmish - Package Conflict**. Take the green Omarchian slot and
+put **Normal AI** in the pink Walled Garden slot. Both slots must be occupied.
+Default cash is $10,000 with Light Support starting units. Rush and Turtle
+AI also work with the map rules; avoid Naval AI on this land map. Two humans
+can play too. Factions, colours and starting positions are fixed.
 
-The same map can be hosted for two humans. Factions, colours and starting
-positions are fixed for this first version. Steam and Yuri's Revenge are
-not required for this OpenRA map.
+Steam and Yuri's Revenge are not required.
 
-## What carries over
+## What's custom
 
-- The roster, humour, Omarchy colours and logo preview. Both factions now
-  have their own terminal-style sidebar icons, selected by the producing
-  factory's faction, including shared units.
-- Standard Red Alert economy, build prerequisites and bot modules. Shared
-  units keep their original actor IDs so AI production, harvesting, MCV
-  deployment and captured factories still use the stock rules.
-- Shared units get faction-dependent names on the battlefield. Shared
-  build-menu tooltip names/descriptions still use the Omarchian version on
-  both sides; the icons themselves now show the correct faction names.
-- A larger, rotationally symmetric battlefield, six regenerating ore mines
-  and open ground between bases. Rocky flanks, debris and a central village
-  add landmarks and obstacles without changing the equal starting economy.
-  No prebuilt campaign bases or free waves.
+- Buildings and defences, with construction reveals, damaged states,
+  production/activity animation, storage stages and connected wall pieces.
+- Vehicles with 32 directional frames, independent tank turrets, transport
+  ramps, harvesting/docking animation and matching recoverable wrecks.
+- Coding-agent helicopters, transports, strike jets and support aircraft;
+  rotor animation and matching crash sprites.
+- Infantry with eight authored directions, generated walking, firing,
+  prone, parachuting and death states, including DHH and Antivirus dogs.
+- Illustrated faction-specific production icons, a self-contained custom
+  palette and player-colour accents.
 
-The older mission remains in `omarchy-edition/` as an archive of the prototype.
-Its mission script and old icon files are not included in this map.
+The two factions keep stock actor IDs so AI, factories, captured structures,
+harvesters and MCV deployment remain compatible. Six country-exclusive units
+are unlocked for the map's two fixed factions; their tech requirements remain.
+DHH retains Tanya's normal tech requirements, cost and one-unit limit.
+Most combat values remain stock; the existing light/heavy tank speed changes
+remain. The symmetric map has six regenerating ore mines and a central village.
 
-## Original construction yards
+## Current limits
 
-Both construction yards now use original sprites: a terminal workshop for
-the Omarchians and a bureaucratic industrial block for the Commies. Each has
-healthy/damaged art, a twelve-frame deployment reveal, a production pulse
-and a dissolving wreck. Roof accents use player colours, including after
-capture. These are simple first-pass animations; their fit against the
-stock terrain and bib still needs an in-game visual check.
+This is a complete first-pass visual set for the listed land-and-air roster,
+not a standalone engine or a fully original game. Terrain, neutral scenery,
+sounds, projectiles, global effects, naval units and stock UI remain Red Alert.
+Some specialist vehicles use adapted chassis from the same original atlas.
+The full inventory is in [assets/ROSTER.md](assets/ROSTER.md).
 
-![Generated construction-yard preview, not gameplay](assets/previews/construction-yards.png)
+Animations are deliberately simple: deployment reveals, colour pulses,
+articulated infantry strides, recoil and collapse. They are not hand-drawn
+frame-by-frame animations. Building footprints, exits, occlusion, rotating
+parts and the overall style still need an in-game visual pass.
 
-The source sheet, provenance and original prompt are in [assets/](assets/README.md).
-Rebuilding now generates all custom sprites, icons and the palette from our
-own sources. No extracted EA palette or separate font download is needed.
-The rest of the battlefield units still use stock artwork. A light tank,
-coding-agent aircraft and DHH hero are good next candidates.
+Shared actors have faction-specific battlefield names and icons. OpenRA's
+stock production tooltip takes one static name: shared sidebar tooltip
+headings can still show the Omarchian name, while descriptions use stock
+unit roles. Disguised spies retain the engine's disguise tooltip behaviour.
+Harvester cargo pips show fullness; the body keeps its faction appearance
+instead of changing to stock ore-truck artwork. The archived mission keeps
+its old names and is not loaded by this skirmish.
 
-## Validation
+## Validation and playtest
 
-`python -m unittest discover -s tests -v` checks equal starting resources,
-clear deployment areas, ground routes, binary resource placement, Fluent
-references, original sprite frames, player-colour indices and reproducible
-packaging with all referenced icons present.
-GitHub Actions additionally builds OpenRA `release-20250330` and runs the
-engine's YAML lint with warnings treated as errors. A passing run provides
-the installable `omarchy-skirmish` artifact. It also decodes all 68 yard
-frames through OpenRA's own sprite loader and publishes art previews.
+Run `python -m unittest discover -s tests -v`. This checks the symmetric
+economy, routes, deployment space, binary map, names, all roster assets,
+sequence bounds, SHP round-trips and reproducible packaging.
 
-These are not playtest claims. Before calling this ready: play a complete
-match on the XPS, observe the AI deploy/build/harvest/attack, train DHH and
-the aircraft, and check victory/defeat and battlefield tooltips. Balance
-and the visual feel still need that playtest.
+CI also builds pinned OpenRA, runs map YAML lint with warnings as errors,
+and decodes every generated SHP through OpenRA's own loader. It compares
+exported pixels, palette, dimensions and visible frame counts. The workflow
+publishes an installable map and art previews.
+
+Before treating the build as playtested, complete a match on the XPS:
+
+1. Deploy both bases; watch the AI build, harvest and attack.
+2. Build the tech tree, tanks, aircraft and DHH. Watch turns, turrets and rotors.
+3. Damage, repair, sell and destroy buildings. Check entrances and overlays.
+4. Unload transports, harvest, capture factories and recover wrecks.
+5. Finish a match and check victory/defeat, visibility and balance.
+
+Asset previews and automated checks are not gameplay evidence.

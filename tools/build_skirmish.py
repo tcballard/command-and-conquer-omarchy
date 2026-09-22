@@ -6,9 +6,8 @@ import struct
 import zipfile
 
 import build_art
-import build_text
-import roster
-import build_skirmish_art
+import skirmish_roster as roster
+import build_roster_art as build_skirmish_art
 
 ROOT = Path(__file__).resolve().parent.parent
 SIZE = 96
@@ -69,17 +68,16 @@ def layout():
 
 
 def rules():
-    # Retain stock actor IDs, prerequisites, transformations and AI modules.
-    # Mission-only variants (.COMMIE) are deliberately not inherited.
+    """Stock actors/AI with complete custom images; faction names are map-local."""
     out = ["""Player:
 	PlayerResources:
 		DefaultCash: 10000
 
 World:
 	Faction@allies:
-		Name: faction-omarchians.name
+		Name: faction-allies.name
 	Faction@soviet:
-		Name: faction-commies.name
+		Name: faction-soviet.name
 	SpawnStartingUnits:
 		StartingUnitsClass: light
 	PaletteFromFile@OMARCHY:
@@ -90,46 +88,68 @@ World:
 		BaseName: omarchy-player
 		RemapIndex: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
 """]
-    omarchy = {entry[0]: entry for entry in roster.OMARCHY}
-    commies = {entry[0]: entry for entry in roster.COMMIE}
-    for actor in sorted(omarchy.keys() | commies.keys()):
-        ours = omarchy.get(actor)
-        theirs = commies.get(actor)
-        side = "omarchy" if ours else "commie"
-        entry = ours or theirs
-        block = f"{actor.upper()}:\n\tTooltip:\n\t\tName: {side}-{actor}.name\n"
-        if ours and theirs:
-            block += ("\t\tRequiresCondition: !omarchy-soviet-owner\n"
-                      "\tGrantConditionOnFaction@OMARCHYSIDE:\n"
-                      "\t\tCondition: omarchy-soviet-owner\n"
-                      "\t\tFactions: soviet, russia, ukraine\n"
-                      "\t\tResetOnOwnerChange: True\n"
-                      "\tTooltip@COMMIE:\n"
-                      f"\t\tName: commie-{actor}.name\n"
-                      "\t\tRequiresCondition: omarchy-soviet-owner\n")
-        # BADR is a support aircraft, not a buildable unit.
-        if actor != "badr":
-            block += "\tBuildable:\n\t\tIconPalette: omarchy-art\n"
-            if entry[2]:
-                block += f"\t\tDescription: {side}-{actor}.description\n"
-            block += f"\tRenderSprites:\n\t\tImage: {side}-{actor}\n"
-            if ours and theirs:
-                block += "\t\tFactionImages:\n"
-                for faction in ("soviet", "russia", "ukraine"):
-                    block += f"\t\t\t{faction}: commie-{actor}\n"
-            if actor == "fact":
-                block += ("\t\tPlayerPalette: omarchy-player\n"
-                          "\tWithDeathAnimation:\n\t\tDeathSequencePalette: omarchy-player\n")
-        if actor in roster.SPEED_TWEAKS:
-            block += f"\tMobile:\n\t\tSpeed: {roster.SPEED_TWEAKS[actor]}\n"
-        if actor in roster.OMARCHY_POWERS:
-            trait = roster.OMARCHY_POWERS[actor][0]
-            block += (f"\t{trait}:\n\t\tName: omarchy-power-{actor}.name\n"
-                      f"\t\tDescription: omarchy-power-{actor}.description\n")
+    ours={e[0]:e for e in roster.OMARCHY}
+    theirs={e[0]:e for e in roster.GARDEN}
+    bibs=set('fact proc silo powr apwr barr tent kenn dome atek stek weap hpad fix gun agun sam ftur tsla pbox gap iron pdox'.split())
+    for actor in sorted(ours.keys() | theirs.keys()):
+        side='omarchy' if actor in ours else 'garden'
+        category=build_skirmish_art.kind(side,actor)
+        shared=actor in ours and actor in theirs
+        tooltip='DisguiseTooltip' if actor=='spy' else 'Tooltip'
+        block=f'{actor.upper()}:\n\t{tooltip}:\n\t\tName: {side}-{actor}.name\n'
+        if shared and actor!='spy':
+            block+=('\t\tRequiresCondition: !garden-owner\n'
+                    '\tTooltip@GARDEN:\n'+f'\t\tName: garden-{actor}.name\n'
+                    '\t\tRequiresCondition: garden-owner\n')
+        if shared and actor!='spy':
+            block+=('\tGrantConditionOnFaction@GARDEN:\n\t\tCondition: garden-owner\n'
+                    '\t\tFactions: soviet, russia, ukraine\n\t\tResetOnOwnerChange: True\n')
+        if actor not in roster.SUPPORT:
+            block+='\tBuildable:\n\t\tIconPalette: omarchy-art\n'
+            # Shared production tooltip text uses the stock role description; custom name is on the icon.
+            if not shared: block+=f'\t\tDescription: {side}-{actor}.description\n'
+            if actor in roster.PREREQUISITES: block+=f'\t\tPrerequisites: {roster.PREREQUISITES[actor]}\n'
+        block+=f'\tRenderSprites:\n\t\tImage: {side}-{actor}\n\t\tPlayerPalette: omarchy-player\n'
+        if shared:
+            block+='\t\tFactionImages:\n'
+            for faction in ('soviet','russia','ukraine'): block+=f'\t\t\t{faction}: garden-{actor}\n'
+        if category=='infantry' or actor in ('fact','proc','powr','apwr'):
+            block+='\tWithDeathAnimation:\n\t\tDeathSequencePalette: omarchy-player\n'
+        if category=='infantry':
+            trait='WithDisguisingInfantryBody' if actor=='spy' else 'WithInfantryBody'
+            block+=f'\t{trait}@PARACHUTE:\n\t\tPalette: omarchy-player\n'
+        for trait in roster.MUZZLE_TRAITS.get(actor, []):
+            block+=f'\t{trait}:\n\t\tMuzzlePalette: omarchy-art\n'
+        if category=='vehicle' and actor not in build_skirmish_art.AIR:
+            block+='\t-ClassicFacingBodyOrientation:\n\tBodyOrientation:\n'
+        if actor in bibs: block+='\t-WithBuildingBib:\n'
+        if actor=='harv':
+            # WithDockingAnimation requires exactly one body. Faction art takes priority
+            # over the stock hard-coded fullness images; resource pips still show cargo.
+            block+='\tWithHarvesterSpriteBody:\n\t\tImageByFullness:\n'
+        if actor in roster.SPEED_TWEAKS: block+=f'\tMobile:\n\t\tSpeed: {roster.SPEED_TWEAKS[actor]}\n'
+        for prefix,powers in [('omarchy',roster.OMARCHY_POWERS),('garden',roster.GARDEN_POWERS)]:
+            if actor in powers:
+                # The shared missile silo uses a neutral support-power name for either owner.
+                if actor=='mslo': continue
+                block+=f'\t{powers[actor][0]}:\n\t\tName: {prefix}-power-{actor}.name\n\t\tDescription: {prefix}-power-{actor}.description\n'
         out.append(block)
-    # DHH uses stock Tanya prerequisites, cost and one-unit limit. No timed spawn.
-    # Naval production is left untouched: this land map has no buildable coast.
-    return "\n".join(out)
+    # Sub-actors explicitly override stock Image fields rather than inheriting stock wrecks.
+    aliases={'E1R1':'e1','E3R1':'e3','SPY.ENGLAND':'spy','AFLD.UKRAINE':'afld','BADR.BOMBER':'badr',
+             '2TNK.HUSK':'2tnk','3TNK.HUSK':'3tnk','4TNK.HUSK':'4tnk','MCV.HUSK':'mcv',
+             'HARV.FULLHUSK':'harv','HARV.EMPTYHUSK':'harv','MGG.HUSK':'mgg',
+             'TRAN.HUSK':'tran','TRAN.HUSK1':'tran','TRAN.HUSK2':'tran',
+             'HELI.HUSK':'heli','MH60.HUSK':'mh60','HIND.HUSK':'hind','MIG.HUSK':'mig',
+             'YAK.HUSK':'yak','BADR.HUSK':'badr','U2.HUSK':'u2'}
+    for alias,actor in aliases.items():
+        side='omarchy' if actor in ours else 'garden'
+        wreck='-wreck' if '.HUSK' in alias or 'HUSK' in alias else ''
+        block=f'{alias}:\n\tRenderSprites:\n\t\tImage: {side}-{actor}{wreck}\n\t\tPlayerPalette: omarchy-player\n'
+        if actor in ours and actor in theirs:
+            block+='\t\tFactionImages:\n'
+            for faction in ('soviet','russia','ukraine'): block+=f'\t\t\t{faction}: garden-{actor}{wreck}\n'
+        out.append(block)
+    return '\n'.join(out)
 
 
 def map_yaml(mines, trees):
@@ -209,7 +229,7 @@ def generate(output):
     (output / "map.yaml").write_text(map_yaml(mines, trees))
     (output / "rules.yaml").write_text(rules())
     # Mission messages aren't loaded: keep only reusable names and descriptions.
-    strings = build_text.ftl().split("## Objectives", 1)[0]
+    strings = roster.ftl()
     (output / "omarchy.ftl").write_text(strings)
     cells = {(x, y): (40, 68, 40) for x in range(SIZE) for y in range(SIZE)}
     for cell in resources:
@@ -235,7 +255,7 @@ def generate(output):
 
 def package(output, destination):
     assets = [output / f"{side}-{actor}-icon.shp" for side, actor in build_skirmish_art.icon_images()]
-    assets += [output / f"{side}-yard.shp" for side in ("omarchy", "commie")]
+    assets += [output / f"{side}-{actor}.shp" for side, entries in roster.SIDES.items() for actor, *_ in entries]
     if not assets or not (output / "sequences.yaml").is_file():
         raise SystemExit("Build the original artwork before packaging.")
     allowed = {"map.yaml", "map.bin", "map.png", "rules.yaml", "sequences.yaml", "omarchy.ftl", "omarchy-art.pal"}

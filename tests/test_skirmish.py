@@ -11,11 +11,22 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import build_skirmish as sk
-import build_skirmish_art as art
+import build_roster_art as art
+import json
 import build_art
 
 
 class SkirmishTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory()
+        cls.output = Path(cls.temp.name) / 'map'
+        sk.generate(cls.output)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp.cleanup()
+
     def test_equal_economy_and_clear_starting_areas(self):
         resources, mines, trees = sk.layout()
         self.assertEqual(resources, {sk.mirror(k): v for k, v in resources.items()})
@@ -46,7 +57,7 @@ class SkirmishTests(unittest.TestCase):
     def test_binary_and_rules_are_skirmish_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
-            sk.generate(out)
+            out = self.output
             data = (out / "map.bin").read_bytes()
             kind, width, height, tiles, heights, resources = struct.unpack_from("<BHHIII", data)
             self.assertEqual((kind, width, height, tiles, heights), (2, 96, 96, 17, 0))
@@ -64,7 +75,12 @@ class SkirmishTests(unittest.TestCase):
             self.assertNotIn("campaign", manifest)
             self.assertEqual(manifest.count(": mpspawn"), 2)
             self.assertEqual(manifest.count("Playable: True"), 2)
-            self.assertNotIn("Prerequisites:", rules)  # stock production/AI compatibility
+            # Only the six country-exclusive units are unlocked for our fixed two factions.
+            self.assertEqual(rules.count("\t\tPrerequisites:"), len(sk.roster.PREREQUISITES))
+            for actor, prerequisite in sk.roster.PREREQUISITES.items():
+                self.assertIn(f"Prerequisites: {prerequisite}", rules)
+            self.assertNotIn("commie", rules.lower())
+            self.assertNotIn("Commies", (out / "omarchy.ftl").read_text())
             strings = (out / "omarchy.ftl").read_text()
             keys = set(re.findall(r"^([a-z][\w-]*) =", strings, re.M))
             for key in re.findall(r"(?:Name|Description): ([\w-]+)\.(?:name|description)", rules):
@@ -73,7 +89,7 @@ class SkirmishTests(unittest.TestCase):
     def test_archive_is_reproducible_and_contains_all_referenced_art(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "map"
-            sk.generate(out)
+            out = self.output
             first, second = Path(tmp) / "first.oramap", Path(tmp) / "second.oramap"
             sk.package(out, first)
             sk.package(out, second)
@@ -86,34 +102,47 @@ class SkirmishTests(unittest.TestCase):
                     self.assertIn(name, names)
                 self.assertEqual(len(archive.read("omarchy-art.pal")), 768)
                 self.assertLessEqual(max(archive.read("omarchy-art.pal")), 63)
-                for side in ("omarchy", "commie"):
-                    sprite = archive.read(f"{side}-yard.shp")
-                    count = struct.unpack_from("<H", sprite)[0]
-                    width, height = struct.unpack_from("<HH", sprite, 6)
-                    self.assertEqual((count, width, height), (34, 96, 96))
-                    decoded = []
+                manifest=json.loads((out/'art-manifest.json').read_text())
+                self.assertEqual(set(manifest), {f'{side}-{actor}' for side,entries in sk.roster.SIDES.items() for actor,*_ in entries})
+                for name,meta in manifest.items():
+                    sprite=archive.read(f'{name}.shp')
+                    count=struct.unpack_from('<H',sprite)[0]
+                    width,height=struct.unpack_from('<HH',sprite,6)
+                    self.assertEqual(count,meta['frames'])
+                    self.assertEqual([width,height],meta['size'])
+                    decoded=[]
                     for i in range(count):
-                        offset = struct.unpack_from("<I", sprite, 14 + i * 8)[0] & 0xFFFFFF
-                        frame = build_art.lcw_decode(sprite[offset:], width * height)
-                        self.assertEqual(len(frame), width * height)
+                        offset=struct.unpack_from('<I',sprite,14+i*8)[0]&0xffffff
+                        frame=build_art.lcw_decode(sprite[offset:],width*height)
+                        self.assertEqual(len(frame),width*height)
                         decoded.append(frame)
-                    self.assertNotEqual(decoded[0], decoded[1])
-                    self.assertLess(sum(bool(p) for p in decoded[2]), sum(bool(p) for p in decoded[13]))
-                    self.assertTrue(any(80 <= p <= 95 for p in decoded[0]))
-                    self.assertLess(sum(bool(p) for p in decoded[-1]), sum(bool(p) for p in decoded[1]))
+                    for seq,fields in meta['sequences'].items():
+                        self.assertLess(fields['Start']+fields['Length']*fields['Facings']-1,count,(name,seq))
+                    seq='stand' if meta['kind']=='infantry' else 'idle'
+                    start=meta['sequences'][seq]['Start']
+                    self.assertTrue(any(decoded[start]),name)
+                    if meta['kind']!='building':
+                        facings=meta['sequences'][seq]['Facings']
+                        self.assertGreaterEqual(facings,8)
+                        self.assertNotEqual(decoded[start],decoded[start+facings//2],name)
+                    else:
+                        damaged=meta['sequences']['damaged-idle']['Start']
+                        self.assertNotEqual(decoded[start],decoded[damaged],name)
 
-    def test_original_sheet_and_faction_icon_coverage(self):
-        images = art.yard_images()
-        self.assertEqual(len(images), 4)
-        for im in images:
-            self.assertEqual(im.size, (96, 96))
-            self.assertEqual(im.getchannel("A").getextrema(), (0, 255))
-        icons = art.icon_images()
-        for entries, side in ((sk.roster.OMARCHY, "omarchy"), (sk.roster.COMMIE, "commie")):
-            for actor, *_ in entries:
-                if actor != "badr":
-                    self.assertIn((side, actor), icons)
-        self.assertNotEqual(icons["omarchy", "e1"].tobytes(), icons["commie", "e1"].tobytes())
+    def test_complete_roster_and_icons(self):
+        icons=art.icon_images()
+        for side,entries in sk.roster.SIDES.items():
+            for actor,*_ in entries:
+                if actor not in sk.roster.SUPPORT:
+                    self.assertIn((side,actor),icons)
+                source=art.source(side,actor)
+                self.assertIsNotNone(source.getchannel('A').getbbox())
+        self.assertNotEqual(icons['omarchy','e1'].tobytes(),icons['garden','e1'].tobytes())
+        rules=sk.rules()
+        self.assertIn('ImageByFullness:\n',rules)
+        self.assertNotIn('WithHarvesterSpriteBody@',rules) # docking requires a single body
+        self.assertIn('HELI.HUSK:',rules)
+        self.assertIn('garden-badr-wreck',rules)
 
 
 if __name__ == "__main__":

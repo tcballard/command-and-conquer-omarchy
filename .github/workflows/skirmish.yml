@@ -45,14 +45,8 @@ jobs:
         env:
           TREAT_WARNINGS_AS_ERRORS: 'true'
         run: ./utility.sh ra --check-yaml ../build/omarchy-skirmish.oramap
-      - name: Decode original sprites with OpenRA
-        working-directory: engine
-        run: |
-          ./utility.sh ra --png ../build/omarchy-skirmish/omarchy-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
-          ./utility.sh ra --png ../build/omarchy-skirmish/commie-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
-          # OpenRA omits the fully transparent first deployment frame (index 2).
-          test "$(find . -maxdepth 1 -name 'omarchy-yard-*.png' | wc -l)" -eq 33
-          test "$(find . -maxdepth 1 -name 'commie-yard-*.png' | wc -l)" -eq 33
+      - name: Decode and verify complete original roster with OpenRA
+        run: python tools/verify_openra_art.py engine build/omarchy-skirmish
       - uses: actions/upload-artifact@v4
         with:
           name: omarchy-skirmish
@@ -61,8 +55,7 @@ jobs:
         with:
           name: skirmish-art-previews
           path: |
-            build/omarchy-skirmish/yard-preview.png
+            build/omarchy-skirmish/roster-preview.png
             build/omarchy-skirmish/icon-preview.png
             build/omarchy-skirmish/map.png
-            engine/omarchy-yard-*.png
-            engine/commie-yard-*.png
+            build/omarchy-skirmish/art-manifest.json
