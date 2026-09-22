@@ -244,38 +244,38 @@ def place_actors(tiles):
     a.waypoint("WestRally", 8, 56)
 
     # ---- The Commies (top-right), walled ----------------------------------
-    a.building("fact.commie", 50, 6, "USSR", name="Compositor")
-    a.building("iron", 55, 7, "USSR", name="FiveYearPlan")
-    a.building("apwr", 44, 4, "USSR")
-    a.building("apwr", 56, 12, "USSR")
-    a.building("powr.commie", 47, 4, "USSR")
-    a.building("powr.commie", 58, 4, "USSR")
-    a.building("powr.commie", 54, 10, "USSR")
-    a.building("barr", 44, 9, "USSR")
-    a.building("weap.commie", 48, 12, "USSR")
-    a.building("kenn", 53, 13, "USSR")
-    a.building("tsla", 42, 14, "USSR")
-    a.building("tsla", 46, 18, "USSR")
-    a.building("tsla", 52, 19, "USSR")
-    a.building("ftur", 41, 10, "USSR")
-    a.building("ftur", 55, 19, "USSR")
+    a.building("fact.commie", 50, 6, "Commies", name="Compositor")
+    a.building("iron", 55, 7, "Commies", name="FiveYearPlan")
+    a.building("apwr", 44, 4, "Commies")
+    a.building("apwr", 56, 12, "Commies")
+    a.building("powr.commie", 47, 4, "Commies")
+    a.building("powr.commie", 58, 4, "Commies")
+    a.building("powr.commie", 54, 10, "Commies")
+    a.building("barr", 44, 9, "Commies")
+    a.building("weap.commie", 48, 12, "Commies")
+    a.building("kenn", 53, 13, "Commies")
+    a.building("tsla", 42, 14, "Commies")
+    a.building("tsla", 46, 18, "Commies")
+    a.building("tsla", 52, 19, "Commies")
+    a.building("ftur", 41, 10, "Commies")
+    a.building("ftur", 55, 19, "Commies")
 
     # Brick wall: west side x=39 (gate at y=15,16), south side y=23 (gate at x=48,49)
     for y in range(4, 24):
         if y in (15, 16):
             continue
-        a.building("brik", 39, y, "USSR")
+        a.building("brik", 39, y, "Commies")
     for x in range(40, 59):
         if x in (48, 49):
             continue
-        a.building("brik", x, 23, "USSR")
+        a.building("brik", x, 23, "Commies")
 
     for (x, y, f) in [(41, 15, 768), (41, 16, 768), (47, 21, 512), (50, 21, 512), (45, 20, 512), (43, 12, 768)]:
-        a.unit("e1.cadre", x, y, "USSR", facing=f, subcell=1)
-    a.unit("3tnk", 44, 16, "USSR", facing=640)
-    a.unit("3tnk", 50, 17, "USSR", facing=640)
-    a.unit("dog", 53, 15, "USSR", facing=512, subcell=1)
-    a.unit("dog", 54, 15, "USSR", facing=512, subcell=1)
+        a.unit("e1.cadre", x, y, "Commies", facing=f, subcell=1)
+    a.unit("3tnk", 44, 16, "Commies", facing=640)
+    a.unit("3tnk", 50, 17, "Commies", facing=640)
+    a.unit("dog", 53, 15, "Commies", facing=512, subcell=1)
+    a.unit("dog", 54, 15, "Commies", facing=512, subcell=1)
 
     a.waypoint("SovietSpawn", 47, 16)
     a.waypoint("ChokePoint", 15, 15)
@@ -377,9 +377,9 @@ Players:
 		Color: 9ECE6A
 		LockSpawn: True
 		LockTeam: True
-		Enemies: USSR
-	PlayerReference@USSR:
-		Name: USSR
+		Enemies: Commies
+	PlayerReference@Commies:
+		Name: Commies
 		Bot: campaign
 		Faction: soviet
 		Color: FE1100
@@ -389,7 +389,7 @@ Actors:
 """
 
 MAP_YAML_TAIL = """
-Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, rules.yaml
+Rules: ra|rules/campaign-rules.yaml, rules.yaml
 
 Sequences: sequences.yaml
 
@@ -451,7 +451,7 @@ TEMPLATE_COLOURS = {
 ORE_COLOUR = (0x94, 0x80, 0x60)
 TREE_COLOUR = (0x1C, 0x20, 0x24)
 WALL_COLOUR = (0xD0, 0xC0, 0xA0)
-OWNER_COLOURS = {"Omarchy": (0x9E, 0xCE, 0x6A), "USSR": (0xFE, 0x11, 0x00)}
+OWNER_COLOURS = {"Omarchy": (0x9E, 0xCE, 0x6A), "Commies": (0xFE, 0x11, 0x00)}
 
 
 def preview_colours(tiles, res, actors):

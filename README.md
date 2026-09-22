@@ -26,3 +26,13 @@ Lint with an engine checkout at tag release-20250330:
 ```sh
 TREAT_WARNINGS_AS_ERRORS=true ./utility.sh ra --check-yaml /path/to/omarchy-edition.oramap
 ```
+
+## In-engine screenshots
+
+Captured from the real OpenRA client (release-20250330, software OpenGL under
+Xvfb) running this map; see `screenshots/` and NOTES.md step 4.7.
+
+| | |
+|---|---|
+| ![base](screenshots/01-omarchian-base.png) | ![wave](screenshots/08-first-wave-hits-the-iso.png) |
+| ![bridge](screenshots/06-pontoon-bridge-fog-off.png) | ![commies](screenshots/09-compositor-tooltip-fog-off.png) |

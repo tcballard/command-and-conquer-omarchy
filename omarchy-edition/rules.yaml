@@ -1,6 +1,8 @@
 Player:
 	PlayerResources:
 		DefaultCash: 1500
+	ModularBot@CampaignAI:
+		Name: commie-bot.name
 
 World:
 	LuaScript:

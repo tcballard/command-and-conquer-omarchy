@@ -276,7 +276,7 @@ Engine built from the release-20250330 tag with .NET SDK 6.0.428
 2. **The lint bites.** A copy with a bogus trait, a bogus `Tooltip.Name` key
    and a bogus key in the Lua produced four errors and exit 1, so the clean
    run above is meaningful.
-3. **Map hash** on the packed file: `37b367418766d77f7defaa398a23c7c3d8a9d7db`
+3. **Map hash** on the packed file: `c89be1b60f548fd2b0d81e20eb2f127ee662cdff`
    (`--map-hash`); the utility opened the zip as a map package. (The first
    delivery, before the colour/logo change, hashed
    `89a85491be33cb53abdf7ed0b935daa97b660f1c`.)
@@ -325,6 +325,40 @@ Engine built from the release-20250330 tag with .NET SDK 6.0.428
    map loads in the server's map cache and its merged ruleset constructs
    without exceptions. The dedicated server never simulates the world, so
    **the Lua was not executed by the engine**.
+
+7. **The game itself, headless (added later).** After the first delivery I
+   got the actual client running in the sandbox: Xvfb 1280x800, Mesa
+   llvmpipe (OpenGL 4.5 software rendering), the freeware Red Alert content
+   fetched from OpenRA's own mirror list (`ra-quickinstall.zip`, SHA1
+   verified against `mods/ra-content/installer/downloads.yaml`), and the
+   engine's `configure-system-libraries.sh` to symlink SDL2/OpenAL/Lua/
+   FreeType. Launched with `Launch.Map=<uid>` which creates a local server
+   and starts the mission directly. Observed, and captured in
+   `screenshots/`:
+   * the base renders in Omarchy green with the logo sign on the ground;
+   * production tooltip "Hyprland Compositor — Powers all windows. Tiling
+     only." and unit tooltip "Alacritty";
+   * the objectives panel lists the three objectives, mission "In progress";
+   * the decree chat message at t=3 s; the pacman -Syu truck harvesting
+     (credits 1500 → 2000 → 3500);
+   * the pontoon bridge and both bases render correctly;
+   * at 6:20 the first wave (two Floating Windows, six Party Cadres) is
+     inside the base shelling the ISO — the timed script and pathing through
+     the ford work.
+   Two fixes came out of this:
+   * `campaign-tooltips.yaml` is no longer in the rules chain. It makes every
+     enemy building/unit show a generic "Enemy Structure"/"Enemy Unit" name,
+     so none of the Soviet jokes would ever appear on hover.
+   * The Soviet player is now named `Commies` (the Lua looks it up as such),
+     and the campaign bot's display label is overridden to "The Commies", so
+     an enemy tooltip reads "Central Planning Compositor / The Commies"
+     instead of "... / Campaign Player AI".
+   Screenshots of the Soviet side were taken on a throwaway copy of the map
+   with fog and shroud disabled (`Shroud: FogCheckboxEnabled: False,
+   ExploredMapCheckboxEnabled: True` appended); the shipped map keeps the
+   campaign shroud. Final packaged UID after these changes:
+   `c89be1b60f548fd2b0d81e20eb2f127ee662cdff` (lint clean, warnings as
+   errors).
 
 ### What was NOT verified
 

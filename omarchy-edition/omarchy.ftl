@@ -9,6 +9,10 @@ faction-omarchians =
 faction-commies =
     .name = The Commies
 
+## Shown in the owner row of enemy tooltips (the scripted enemy is a bot)
+commie-bot =
+    .name = The Commies
+
 ## Omarchian structures
 omarchy-fact =
     .name = The ISO

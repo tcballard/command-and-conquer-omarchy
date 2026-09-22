@@ -35,9 +35,9 @@ Players:
 		Color: 9ECE6A
 		LockSpawn: True
 		LockTeam: True
-		Enemies: USSR
-	PlayerReference@USSR:
-		Name: USSR
+		Enemies: Commies
+	PlayerReference@Commies:
+		Name: Commies
 		Bot: campaign
 		Faction: soviet
 		Color: FE1100
@@ -106,200 +106,200 @@ Actors:
 		Owner: Neutral
 	Compositor: fact.commie
 		Location: 50,6
-		Owner: USSR
+		Owner: Commies
 	FiveYearPlan: iron
 		Location: 55,7
-		Owner: USSR
+		Owner: Commies
 	Actor13: apwr
 		Location: 44,4
-		Owner: USSR
+		Owner: Commies
 	Actor14: apwr
 		Location: 56,12
-		Owner: USSR
+		Owner: Commies
 	Actor15: powr.commie
 		Location: 47,4
-		Owner: USSR
+		Owner: Commies
 	Actor16: powr.commie
 		Location: 58,4
-		Owner: USSR
+		Owner: Commies
 	Actor17: powr.commie
 		Location: 54,10
-		Owner: USSR
+		Owner: Commies
 	Actor18: barr
 		Location: 44,9
-		Owner: USSR
+		Owner: Commies
 	Actor19: weap.commie
 		Location: 48,12
-		Owner: USSR
+		Owner: Commies
 	Actor20: kenn
 		Location: 53,13
-		Owner: USSR
+		Owner: Commies
 	Actor21: tsla
 		Location: 42,14
-		Owner: USSR
+		Owner: Commies
 	Actor22: tsla
 		Location: 46,18
-		Owner: USSR
+		Owner: Commies
 	Actor23: tsla
 		Location: 52,19
-		Owner: USSR
+		Owner: Commies
 	Actor24: ftur
 		Location: 41,10
-		Owner: USSR
+		Owner: Commies
 	Actor25: ftur
 		Location: 55,19
-		Owner: USSR
+		Owner: Commies
 	Actor26: brik
 		Location: 39,4
-		Owner: USSR
+		Owner: Commies
 	Actor27: brik
 		Location: 39,5
-		Owner: USSR
+		Owner: Commies
 	Actor28: brik
 		Location: 39,6
-		Owner: USSR
+		Owner: Commies
 	Actor29: brik
 		Location: 39,7
-		Owner: USSR
+		Owner: Commies
 	Actor30: brik
 		Location: 39,8
-		Owner: USSR
+		Owner: Commies
 	Actor31: brik
 		Location: 39,9
-		Owner: USSR
+		Owner: Commies
 	Actor32: brik
 		Location: 39,10
-		Owner: USSR
+		Owner: Commies
 	Actor33: brik
 		Location: 39,11
-		Owner: USSR
+		Owner: Commies
 	Actor34: brik
 		Location: 39,12
-		Owner: USSR
+		Owner: Commies
 	Actor35: brik
 		Location: 39,13
-		Owner: USSR
+		Owner: Commies
 	Actor36: brik
 		Location: 39,14
-		Owner: USSR
+		Owner: Commies
 	Actor37: brik
 		Location: 39,17
-		Owner: USSR
+		Owner: Commies
 	Actor38: brik
 		Location: 39,18
-		Owner: USSR
+		Owner: Commies
 	Actor39: brik
 		Location: 39,19
-		Owner: USSR
+		Owner: Commies
 	Actor40: brik
 		Location: 39,20
-		Owner: USSR
+		Owner: Commies
 	Actor41: brik
 		Location: 39,21
-		Owner: USSR
+		Owner: Commies
 	Actor42: brik
 		Location: 39,22
-		Owner: USSR
+		Owner: Commies
 	Actor43: brik
 		Location: 39,23
-		Owner: USSR
+		Owner: Commies
 	Actor44: brik
 		Location: 40,23
-		Owner: USSR
+		Owner: Commies
 	Actor45: brik
 		Location: 41,23
-		Owner: USSR
+		Owner: Commies
 	Actor46: brik
 		Location: 42,23
-		Owner: USSR
+		Owner: Commies
 	Actor47: brik
 		Location: 43,23
-		Owner: USSR
+		Owner: Commies
 	Actor48: brik
 		Location: 44,23
-		Owner: USSR
+		Owner: Commies
 	Actor49: brik
 		Location: 45,23
-		Owner: USSR
+		Owner: Commies
 	Actor50: brik
 		Location: 46,23
-		Owner: USSR
+		Owner: Commies
 	Actor51: brik
 		Location: 47,23
-		Owner: USSR
+		Owner: Commies
 	Actor52: brik
 		Location: 50,23
-		Owner: USSR
+		Owner: Commies
 	Actor53: brik
 		Location: 51,23
-		Owner: USSR
+		Owner: Commies
 	Actor54: brik
 		Location: 52,23
-		Owner: USSR
+		Owner: Commies
 	Actor55: brik
 		Location: 53,23
-		Owner: USSR
+		Owner: Commies
 	Actor56: brik
 		Location: 54,23
-		Owner: USSR
+		Owner: Commies
 	Actor57: brik
 		Location: 55,23
-		Owner: USSR
+		Owner: Commies
 	Actor58: brik
 		Location: 56,23
-		Owner: USSR
+		Owner: Commies
 	Actor59: brik
 		Location: 57,23
-		Owner: USSR
+		Owner: Commies
 	Actor60: brik
 		Location: 58,23
-		Owner: USSR
+		Owner: Commies
 	Actor61: e1.cadre
 		Location: 41,15
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 768
 	Actor62: e1.cadre
 		Location: 41,16
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 768
 	Actor63: e1.cadre
 		Location: 47,21
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 512
 	Actor64: e1.cadre
 		Location: 50,21
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 512
 	Actor65: e1.cadre
 		Location: 45,20
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 512
 	Actor66: e1.cadre
 		Location: 43,12
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 768
 	Actor67: 3tnk
 		Location: 44,16
-		Owner: USSR
+		Owner: Commies
 		Facing: 640
 	Actor68: 3tnk
 		Location: 50,17
-		Owner: USSR
+		Owner: Commies
 		Facing: 640
 	Actor69: dog
 		Location: 53,15
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 512
 	Actor70: dog
 		Location: 54,15
-		Owner: USSR
+		Owner: Commies
 		SubCell: 1
 		Facing: 512
 	SovietSpawn: waypoint
@@ -471,7 +471,7 @@ Actors:
 		Location: 55,60
 		Owner: Neutral
 
-Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, rules.yaml
+Rules: ra|rules/campaign-rules.yaml, rules.yaml
 
 Sequences: sequences.yaml
 

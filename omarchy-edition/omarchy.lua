@@ -135,7 +135,7 @@ end
 
 WorldLoaded = function()
 	Omarchy = Player.GetPlayer("Omarchy")
-	USSR = Player.GetPlayer("USSR")
+	USSR = Player.GetPlayer("Commies")
 
 	InitObjectives(Omarchy)
 
