@@ -75,9 +75,9 @@ def rules():
 
 World:
 	Faction@allies:
-		Name: faction-allies.name
+		Name: omarchy-skirmish-faction-allies.name
 	Faction@soviet:
-		Name: faction-soviet.name
+		Name: omarchy-skirmish-faction-soviet.name
 	SpawnStartingUnits:
 		StartingUnitsClass: light
 	PaletteFromFile@OMARCHY:

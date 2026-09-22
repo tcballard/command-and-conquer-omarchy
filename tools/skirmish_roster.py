@@ -73,7 +73,7 @@ GARDEN_POWERS = {
 def ftl():
     lines=['## Generated skirmish names; archived mission names are not loaded.']
     for key,value in FACTIONS.items():
-        lines += [f'faction-{key} =\n    .name = {value}']
+        lines += [f'omarchy-skirmish-faction-{key} =\n    .name = {value}']
     for side,entries in SIDES.items():
         for actor,name,desc,role in entries:
             lines += [f'{side}-{actor} =\n    .name = {name}\n    .description = {desc or role or name}']

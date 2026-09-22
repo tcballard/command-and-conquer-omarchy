@@ -79,7 +79,7 @@ def make_palette(images):
         palette[80 + i] = tuple(min(255, round(c * factor)) for c in GREEN)
     # Round-trip the exact six-bit values the engine will load.
     data = bytes(round(c * 63 / 255) for rgb in palette for c in rgb)
-    return data, [tuple(data[i + k] * 255 // 63 for k in range(3)) for i in range(0, 768, 3)]
+    return data, [tuple((data[i + k] << 2) | (data[i + k] >> 4) for k in range(3)) for i in range(0, 768, 3)]
 
 
 def indexed(im, palette, team_colours=False):

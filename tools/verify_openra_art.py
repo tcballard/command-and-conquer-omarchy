@@ -14,7 +14,7 @@ def main():
     parser.add_argument('art',type=Path)
     args=parser.parse_args();engine=args.engine.resolve();art=args.art.resolve()
     palette=(art/'omarchy-art.pal').read_bytes()
-    colours=[tuple(palette[i+k]*255//63 for k in range(3)) for i in range(0,768,3)]
+    colours=[tuple((palette[i+k]<<2)|(palette[i+k]>>4) for k in range(3)) for i in range(0,768,3)]
     sprites=sorted(art.glob('*.shp'))
     # The generated manifest excludes stale artifacts from earlier builds.
     import json
@@ -38,7 +38,7 @@ def main():
                 assert im.size==(w,h),(png,im.size,(w,h))
                 for index,actual in zip(expected,im.convert('RGBA').getdata()):
                     assert (actual[3]>0)==bool(index),(png,'alpha mismatch')
-                    if index: assert all(abs(actual[k]-colours[index][k])<=1 for k in range(3)),(png,'palette/pixel mismatch')
+                    if index: assert all(actual[k]==colours[index][k] for k in range(3)),(png,'palette/pixel mismatch')
             count+=1
         actual=set(engine.glob(f'{sprite.stem}-*.png'))
         assert actual==set(expected_files),(sprite,'unexpected frames')
