@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Linq;
+using System.IO;
+using OpenRA.Mods.Common.Traits.Render;
 using OpenRA;
 
 namespace OpenRA.Mods.Omarchy
@@ -22,6 +24,26 @@ namespace OpenRA.Mods.Omarchy
                 mod.Manifest.Missions.Length != 0 || mod.Manifest.MapFolders.Count != 1 ||
                 mod.ObjectCreator.FindType("OmarchyMenuLogic") != typeof(OmarchyMenuLogic))
                 throw new InvalidOperationException("Omarchy must expose exactly one skirmish, one backdrop, and no missions.");
+            using var reader = new StreamReader(mod.DefaultFileSystem.Open("omarchy|roster-check.tsv"));
+            var expected = reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (expected.Length != 91)
+                throw new InvalidOperationException("The complete 91-entry faction roster is required.");
+            foreach (var preview in available)
+            {
+                using var map = new Map(mod, preview.Package);
+                if (map.InvalidCustomRules)
+                    throw new InvalidOperationException("Custom rules failed to load.", map.InvalidCustomRulesException);
+                foreach (var row in expected)
+                {
+                    var entry = row.Split('\t');
+                    var actor = map.Rules.Actors[entry[0]];
+                    var render = actor.TraitInfo<RenderSpritesInfo>();
+                    if (render.GetImage(actor, entry[1]) != entry[2] || render.PlayerPalette != "omarchy-player" ||
+                        !map.Sequences.Images.Contains(entry[2]) || !map.Exists(entry[2] + ".shp"))
+                        throw new InvalidOperationException($"Custom roster missing: {row} on {map.Title}");
+                }
+            }
+            Console.WriteLine("All 91 faction roster entries resolve to custom images in both maps.");
             Console.WriteLine("Omarchy catalog verified: one playable skirmish, one backdrop, no campaign; custom menu resolves.");
         }
     }

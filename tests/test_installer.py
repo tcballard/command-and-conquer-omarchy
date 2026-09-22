@@ -1,4 +1,5 @@
-"""Exercise installer lifecycle in isolated homes with mocked system commands."""
+"""Installed-bundle lifecycle; the real engine roster check is also run in CI."""
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -19,111 +20,92 @@ class InstallerTests(unittest.TestCase):
         self.home.mkdir()
         self.bin = self.root / 'bin'
         self.bin.mkdir()
-        self.state = self.root / 'installed'
         self.calls = self.root / 'calls'
-        self.env = dict(os.environ, HOME=str(self.home),
-                        XDG_CONFIG_HOME=str(self.home / 'config'),
-                        XDG_DATA_HOME=str(self.home / 'data'),
-                        PATH=str(self.bin) + ':' + os.environ['PATH'],
-                        INSTALL_STATE=str(self.state), CALLS=str(self.calls))
-        self.mock('id', 'echo 1000')
-        self.mock('uname', 'echo x86_64')
-        self.mock('pacman', '''
-if [ "$1" = -Q ]; then
-  [ -f "$INSTALL_STATE" ] || exit 1
-  printf 'openra %s\\n' "${MOCK_VERSION:-20250330-3}"
-else
-  printf '%s\\n' "$*" >> "$CALLS"
-  touch "$INSTALL_STATE"
-fi''')
-        self.mock('sudo', 'exec "$@"')
-        self.mock('openra-ra', 'printf "launch\\n" >> "$CALLS"')
-        self.mock('update-desktop-database', 'exit 0')
-        self.engine = self.root / 'engine'
-        self.engine.mkdir()
-        (self.engine / 'OpenRA').write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$CALLS.args"\nprintf "launch\\n" >> "$CALLS"\n')
-        (self.engine / 'OpenRA').chmod(0o755)
-        self.env['OMARCHY_OPENRA_DIR'] = str(self.engine)
-        self.mods = self.root / 'mods'
-        (self.mods / 'omarchy').mkdir(parents=True)
-        (self.mods / 'omarchy/OpenRA.Mods.Omarchy.dll').write_bytes(b'mocked assembly')
-        (self.mods / 'omarchy/mod.yaml.in').write_text('Assemblies: @OMARCHY_DLL@\n')
-        self.payload = self.root / 'map.oramap'
-        self.payload.write_bytes(b'custom map test fixture\x00\xff')
-        self.installer = build(self.payload, self.root / 'installer.sh', self.mods)
+        self.env = dict(os.environ, HOME=str(self.home), XDG_DATA_HOME=str(self.home / 'data'),
+                        XDG_CONFIG_HOME=str(self.home / 'config'), PATH=str(self.bin) + ':' + os.environ['PATH'],
+                        CALLS=str(self.calls))
+        self.script(self.bin / 'id', 'echo 1000')
+        self.script(self.bin / 'uname', 'echo x86_64')
+        self.script(self.bin / 'pacman', 'echo "System OpenRA must not be used" >&2; exit 99')
+        self.script(self.bin / 'update-desktop-database', 'exit 0')
+        self.bundle = self.root / 'bundle'
+        (self.bundle / 'mods/omarchy').mkdir(parents=True)
+        (self.bundle / 'mods/omarchy/mod.yaml').write_text('Assemblies: OpenRA.Mods.Omarchy.dll\n')
+        (self.bundle / 'libhostfxr.so').write_bytes(b'test runtime')
+        (self.bundle / 'OMARCHY_VERSION').write_text('v0.0.1-preview.3\n')
+        self.script(self.bundle / 'OpenRA', 'printf "%s\\n" "$@" > "$CALLS.args"')
+        self.script(self.bundle / 'OpenRA.Utility', 'test "${FAIL_CHECK:-0}" = 0; printf "%s\\n" "$*" >> "$CALLS"')
+        self.write_manifest()
+        self.installer = build(self.bundle, self.root / 'installer.sh')
         self.app = self.home / 'data/command-and-conquer-omarchy'
-        self.map = self.home / 'config/openra/maps/ra/release-20250330/omarchy-skirmish.oramap'
         self.desktop = self.home / 'data/applications/command-and-conquer-omarchy.desktop'
 
-    def mock(self, name, body):
-        path = self.bin / name
+    def script(self, path, body):
         path.write_text('#!/bin/sh\nset -eu\n' + body + '\n')
         path.chmod(0o755)
 
+    def write_manifest(self):
+        (self.bundle / 'SHA256SUMS').write_text(''.join(
+            f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(self.bundle)}\n'
+            for p in sorted(self.bundle.rglob('*')) if p.is_file() and p.name != 'SHA256SUMS'))
+
     def run_installer(self, *args, ok=True):
-        result = subprocess.run(['bash', str(self.installer), *args], env=self.env,
-                                capture_output=True, text=True)
-        if ok:
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        else:
-            self.assertNotEqual(result.returncode, 0)
+        result = subprocess.run(['bash', str(self.installer), *args], env=self.env, capture_output=True, text=True)
+        self.assertEqual(result.returncode == 0, ok, result.stdout + result.stderr)
         return result
 
-    def test_fresh_install_launch_reinstall_remove_preserves_other_data(self):
-        other = self.home / 'config/openra/saves/keep'
-        other.parent.mkdir(parents=True)
-        other.write_text('save')
+    def test_fresh_install_launch_reinstall_verify_remove_preserves_other_data(self):
+        stock = self.home / 'config/openra/maps/ra/release-20250330/omarchy-skirmish.oramap'
+        stock.parent.mkdir(parents=True)
+        stock.write_bytes(b'old user map')
         self.run_installer()
-        self.assertEqual(self.map.read_bytes(), self.payload.read_bytes())
         args = Path(str(self.calls) + '.args').read_text()
-        self.assertIn('Game.Mod=' + str(self.app / 'mods/omarchy'), args)
-        self.assertIn('Game.AllowDownloading=false', args)
-        self.assertNotIn('@OMARCHY_DLL@', (self.app / 'mods/omarchy/mod.yaml').read_text())
-        self.assertIn('Name=Command & Conquer: Omarchy Edition', self.desktop.read_text())
-        self.assertEqual(self.calls.read_text().splitlines(), ['-S --needed openra', 'launch'])
+        self.assertIn('Game.Mod=omarchy\n', args)
+        self.assertNotIn('/usr/lib/openra', args)
+        self.assertIn('Engine.SupportDir=' + str(self.app / 'support'), args)
+        self.assertTrue(os.access(self.app / 'current/OpenRA', os.X_OK))
+        previous = (self.app / 'current').resolve()
         self.run_installer('--no-launch')
-        self.assertEqual(len(self.calls.read_text().splitlines()), 2)
+        self.assertNotEqual(previous, (self.app / 'current').resolve())
+        subprocess.run(['bash', str(self.app / 'launch.sh'), '--verify'], env=self.env, check=True, capture_output=True)
+        bad = subprocess.run(['bash', str(self.app / 'launch.sh'), 'Game.Mod=ra'], env=self.env, capture_output=True)
+        self.assertNotEqual(bad.returncode, 0)
+        save = self.app / 'support/save'
+        save.write_text('keep')
         self.run_installer('--uninstall')
-        self.assertFalse(self.map.exists())
         self.assertFalse(self.desktop.exists())
-        self.assertTrue(self.state.exists())
-        self.assertEqual(other.read_text(), 'save')
-        self.run_installer('--uninstall')
+        self.assertFalse((self.app / 'current').exists())
+        self.assertEqual(stock.read_bytes(), b'old user map')
+        self.assertEqual(save.read_text(), 'keep')
 
-    def test_legacy_home_and_previous_map_restored(self):
-        self.map = self.home / '.openra/maps/ra/release-20250330/omarchy-skirmish.oramap'
-        self.map.parent.mkdir(parents=True)
-        self.map.write_bytes(b'previous build')
+    def test_failed_roster_check_retains_previous_install(self):
         self.run_installer('--no-launch')
-        self.run_installer('--no-launch')
-        self.assertEqual(self.map.read_bytes(), self.payload.read_bytes())
-        self.run_installer('--uninstall')
-        self.assertEqual(self.map.read_bytes(), b'previous build')
-
-    def test_modified_map_is_preserved_on_removal(self):
-        self.run_installer('--no-launch')
-        self.map.write_bytes(b'user edit')
-        self.run_installer('--uninstall', ok=False)
-        self.assertEqual(self.map.read_bytes(), b'user edit')
-        self.assertTrue((self.app / 'uninstall.sh').exists())
-
-    def test_incompatible_engine_and_root_refused(self):
-        self.state.touch()
-        self.env['MOCK_VERSION'] = '20990101-1'
+        old = (self.app / 'current').resolve()
+        self.env['FAIL_CHECK'] = '1'
         self.run_installer('--no-launch', ok=False)
-        self.assertFalse(self.app.exists())
-        self.mock('id', 'echo 0')
+        self.assertEqual((self.app / 'current').resolve(), old)
+
+    def test_missing_runtime_or_corrupt_installed_payload_is_rejected(self):
+        (self.bundle / 'libhostfxr.so').unlink()
+        with self.assertRaises(FileNotFoundError):
+            build(self.bundle, self.installer)
+        (self.bundle / 'libhostfxr.so').write_bytes(b'wrong runtime')
+        build(self.bundle, self.installer)
         self.run_installer('--no-launch', ok=False)
         self.assertFalse(self.app.exists())
 
-    def test_corruption_fails_before_package_install_and_build_is_reproducible(self):
+    def test_embedded_corruption_rejected_and_package_reproducible(self):
         before = self.installer.read_bytes()
-        build(self.payload, self.installer, self.mods)
+        build(self.bundle, self.installer)
         self.assertEqual(before, self.installer.read_bytes())
         header, data = before.split(b'__OMARCHY_PAYLOAD__\n')
         self.installer.write_bytes(header + b'A' + data[1:])
         self.run_installer('--no-launch', ok=False)
-        self.assertFalse(self.state.exists())
+        self.assertFalse(self.app.exists())
+
+    def test_root_refused(self):
+        self.script(self.bin / 'id', 'echo 0')
+        self.run_installer('--no-launch', ok=False)
         self.assertFalse(self.app.exists())
 
 

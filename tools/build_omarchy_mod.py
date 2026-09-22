@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import shutil
 import zipfile
+import skirmish_roster as roster
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -24,11 +25,13 @@ def build(engine, dll, output):
     begin = manifest.index('MapFolders:')
     end = manifest.index('\nRules:', begin)
     manifest = manifest[:begin] + 'MapFolders:\n\tomarchy|maps: System\n' + manifest[end:]
-    manifest = manifest.replace('\tra|rules/fakes.yaml', '\tra|rules/fakes.yaml\n\tomarchy|rules.yaml')
+    manifest = manifest.replace('\tra|rules/fakes.yaml', '\tra|rules/fakes.yaml\n\tomarchy|roster/rules.yaml\n\tomarchy|rules.yaml')
+    manifest = manifest.replace('\tra|sequences/decorations.yaml', '\tra|sequences/decorations.yaml\n\tomarchy|roster/sequences.yaml')
+    manifest = manifest.replace('\t\t$omarchy: omarchy', '\t\t$omarchy: omarchy\n\t\tomarchy|roster')
     manifest = manifest.replace('Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Cnc.dll',
                                 'Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Cnc.dll, @OMARCHY_DLL@')
     manifest = manifest.replace('\tcommon|chrome/mainmenu.yaml', '\tomarchy|menu.yaml')
-    manifest = manifest.replace('\tra|fluent/rules.ftl', '\tra|fluent/rules.ftl\n\tomarchy|messages.ftl')
+    manifest = manifest.replace('\tra|fluent/rules.ftl', '\tra|fluent/rules.ftl\n\tomarchy|messages.ftl\n\tomarchy|roster/omarchy.ftl')
     manifest = manifest.replace('Missions:\n\tra|missions.yaml', 'Missions:')
     manifest = manifest.replace('SupportsMapsFrom: ra', 'SupportsMapsFrom: omarchy')
     # Stock strings for omitted UI are allowed in the shared upstream packages.
@@ -46,14 +49,28 @@ def build(engine, dll, output):
     (content / 'mod.yaml').write_text(content_manifest)
     shutil.copyfile(engine / 'COPYING', mod / 'COPYING.OpenRA')
     (mod / 'SOURCE.txt').write_text('OpenRA manifest/content configuration: https://github.com/OpenRA/OpenRA/tree/release-20250330 (GPL-3.0-or-later).\nCustom menu source: https://github.com/tcballard/command-and-conquer-omarchy/tree/codex/omarchy-skirmish/mod (GPL-3.0-or-later).\n')
+    # Make the custom roster the mod defaults, not optional per-map overrides.
+    art = mod / 'roster'
+    art.mkdir(exist_ok=True)
+    with zipfile.ZipFile(ROOT / 'build/omarchy-skirmish.oramap') as src:
+        for name in src.namelist():
+            if name not in ('map.yaml', 'map.bin', 'map.png'):
+                (art / name).write_bytes(src.read(name))
+    (mod / 'roster-check.tsv').write_text(''.join(
+        f'{actor}\t{faction}\t{side}-{actor}\n'
+        for side, faction in [('omarchy', 'allies'), ('garden', 'soviet')]
+        for actor, *_ in roster.SIDES[side]))
     maps = mod / 'maps'
     maps.mkdir(exist_ok=True)
     battle = maps / 'package-conflict.oramap'
     with zipfile.ZipFile(ROOT / 'build/omarchy-skirmish.oramap') as src, zipfile.ZipFile(battle, 'w', zipfile.ZIP_DEFLATED) as dst:
         for name in src.namelist():
+            if name not in ('map.yaml', 'map.bin', 'map.png'):
+                continue
             data = src.read(name)
             if name == 'map.yaml':
                 data = data.replace(b'RequiresMod: ra', b'RequiresMod: omarchy')
+                data = data.replace(b'Rules: rules.yaml\nSequences: sequences.yaml\nFluentMessages: omarchy.ftl\n', b'')
             item = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
             item.compress_type = zipfile.ZIP_DEFLATED
             dst.writestr(item, data)

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Generated single-file installer. Run with bash, without sudo.
+# Complete user-local Omarchy Edition bundle. No system OpenRA dependency.
 set -euo pipefail
-expected_version=20250330
-payload_sha='@MAP_SHA@'
+payload_sha='@PAYLOAD_SHA@'
 app_id=command-and-conquer-omarchy
 mode=install
 case "${1:-}" in
@@ -17,12 +16,10 @@ esac
 app_dir="${XDG_DATA_HOME:-$HOME/.local/share}/$app_id"
 applications="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 if [[ $mode == uninstall ]]; then
-  [[ -f "$app_dir/uninstall.sh" ]] || { echo 'No single-installer installation found.'; exit 0; }
+  [[ -f "$app_dir/uninstall.sh" ]] || { echo 'No bundled installation found.'; exit 0; }
   exec bash "$app_dir/uninstall.sh"
 fi
-command -v pacman >/dev/null || { echo 'This installer targets Omarchy / Arch Linux.' >&2; exit 1; }
-[[ $(uname -m) == x86_64 ]] || { echo 'This build targets your x86_64 Omarchy PC.' >&2; exit 1; }
-# Verify the embedded map before installing any dependencies or changing user files.
+[[ $(uname -m) == x86_64 ]] || { echo 'This bundle requires x86_64 Linux.' >&2; exit 1; }
 staging=$(mktemp -d)
 trap 'rm -rf -- "$staging"' EXIT
 trap 'exit 130' INT
@@ -32,125 +29,82 @@ printf '%s  %s\n' "$payload_sha" "$staging/payload.tar.gz" | sha256sum --check -
   echo 'Installer payload is damaged. Download it again.' >&2; exit 1;
 }
 tar -xzf "$staging/payload.tar.gz" -C "$staging"
-map_sha=$(sha256sum "$staging/map.oramap")
-map_sha=${map_sha%% *}
-if ! pacman -Q openra >/dev/null 2>&1; then
-  echo 'Installing OpenRA from your configured Arch repositories (sudo may ask for your password).'
-  sudo pacman -S --needed openra
-fi
-installed=$(pacman -Q openra)
-version=${installed#* }
-version=${version#*:}
-[[ ${version%-*} == "$expected_version" ]] || {
-  echo "This skirmish requires OpenRA $expected_version; installed: $installed." >&2
-  echo 'No game files changed. Use a matching installer; OpenRA was not downgraded.' >&2
-  exit 1
-}
-command -v openra-ra >/dev/null || { echo 'OpenRA Red Alert launcher is missing. Repair the openra package.' >&2; exit 1; }
-map_dir="${XDG_CONFIG_HOME:-$HOME/.config}/openra/maps/ra/release-$expected_version"
-[[ ! -d "$HOME/.openra" ]] || map_dir="$HOME/.openra/maps/ra/release-$expected_version"
-# Reinstalls keep managing the original location, even if XDG_CONFIG_HOME changes.
-[[ ! -f "$app_dir/map-path" ]] || map_dir=$(dirname -- "$(cat "$app_dir/map-path")")
-map_path="$map_dir/omarchy-skirmish.oramap"
-mkdir -p -- "$app_dir" "$applications" "$map_dir"
-# Preserve the pre-installer map once, across reinstalls and upgrades.
-if [[ ! -f "$app_dir/map-path" ]]; then
-  if [[ -e "$map_path" || -L "$map_path" ]]; then
-    cp -p -- "$map_path" "$app_dir/previous.oramap"
-  fi
-  printf '%s\n' "$map_path" > "$app_dir/map-path"
-fi
-atomic_install() {
-  local tmp
-  tmp=$(mktemp "${2}.XXXXXX")
-  if install -m "$3" -- "$1" "$tmp" && mv -f -- "$tmp" "$2"; then return 0; fi
-  rm -f -- "$tmp"
-  return 1
-}
-# Only this app-owned mod directory is replaced; engine files are never patched.
-mkdir -p "$app_dir/mods" "$app_dir/support"
-openra_support=${map_dir%/maps/ra/*}
-mkdir -p "$openra_support/Content"
+(cd "$staging/engine" && sha256sum --check --status SHA256SUMS)
+# Test the actual bundled engine and every custom faction image before activation.
+(cd "$staging/engine" && ENGINE_DIR="$staging/engine" MOD_SEARCH_PATHS="$staging/engine/mods" ./OpenRA.Utility omarchy --check-omarchy)
+version=$(cat "$staging/engine/OMARCHY_VERSION")
+[[ $version =~ ^v[0-9A-Za-z.-]+$ ]] || { echo 'Invalid bundle version.' >&2; exit 1; }
+mkdir -p "$app_dir/releases" "$app_dir/support" "$applications"
+# Reuse an existing content download, but never put another map into stock Red Alert.
 if [[ ! -e "$app_dir/support/Content" && ! -L "$app_dir/support/Content" ]]; then
-  ln -s "$openra_support/Content" "$app_dir/support/Content"
+  for candidate in "${XDG_CONFIG_HOME:-$HOME/.config}/openra/Content" "$HOME/.openra/Content"; do
+    if [[ -d $candidate ]]; then ln -s "$candidate" "$app_dir/support/Content"; break; fi
+  done
 fi
-cp -a "$staging/mods/." "$app_dir/mods/"
-manifest=$(cat "$app_dir/mods/omarchy/mod.yaml.in")
-manifest=${manifest//@OMARCHY_DLL@/$app_dir/mods/omarchy/OpenRA.Mods.Omarchy.dll}
-printf '%s\n' "$manifest" > "$staging/mod.yaml"
-atomic_install "$staging/mod.yaml" "$app_dir/mods/omarchy/mod.yaml" 644
-atomic_install "$staging/map.oramap" "$map_path" 644
-printf '%s\n' "$map_sha" > "$app_dir/map-sha256"
+# Unique immutable directory + atomic pointer means a failed install retains the old build.
+release_dir=$(mktemp -d "$app_dir/releases/$version.XXXXXX")
+cp -a "$staging/engine/." "$release_dir/"
+(cd "$release_dir" && sha256sum --check --status SHA256SUMS)
+ln -s "$release_dir" "$app_dir/current.new"
+mv -Tf "$app_dir/current.new" "$app_dir/current"
 cat > "$staging/launch.sh" <<'LAUNCH'
 #!/usr/bin/env bash
 set -euo pipefail
-installed=$(pacman -Q openra 2>/dev/null || true)
-version=${installed#* }; version=${version#*:}
-if [[ ${version%-*} != 20250330 ]]; then
-  message='This Omarchy skirmish needs OpenRA 20250330. Install a matching build before playing.'
-  if command -v zenity >/dev/null; then zenity --error --text="$message"; else echo "$message" >&2; fi
-  exit 1
-fi
 app_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-engine_dir=${OMARCHY_OPENRA_DIR:-/usr/lib/openra}
+engine_dir=$(readlink -f "$app_dir/current")
+# The content downloader may restart into either of these two mods only.
+for arg in "$@"; do
+  case "$arg" in
+    Game.Mod=omarchy|Game.Mod=omarchy-content) ;;
+    Game.Mod=*|Engine.*) echo "Unsupported launch override: $arg" >&2; exit 2 ;;
+  esac
+done
 cd "$engine_dir"
-exec "$engine_dir/OpenRA" "Game.Mod=$app_dir/mods/omarchy" \
-  "Engine.ModSearchPaths=$engine_dir/mods,$app_dir/mods" \
+export ENGINE_DIR="$engine_dir" MOD_SEARCH_PATHS="$engine_dir/mods"
+if [[ ${1:-} == --verify ]]; then
+  sha256sum --check --status SHA256SUMS
+  exec ./OpenRA.Utility omarchy --check-omarchy
+fi
+printf 'Starting Omarchy Edition %s (bundled engine)\n' "$(cat OMARCHY_VERSION)"
+exec ./OpenRA Game.Mod=omarchy "Engine.ModSearchPaths=$engine_dir/mods" \
   "Engine.LaunchPath=$app_dir/launch.sh" "Engine.SupportDir=$app_dir/support" \
   Game.FetchNews=false Game.AllowDownloading=false Debug.CheckVersion=false "$@"
 LAUNCH
-atomic_install "$staging/launch.sh" "$app_dir/launch.sh" 755
-# Desktop Exec uses its own escaping, distinct from shell quoting.
+install -m755 "$staging/launch.sh" "$app_dir/launch.sh"
 desktop_path=${app_dir//\\/\\\\}
 desktop_path=${desktop_path//\"/\\\"}
 desktop_path=${desktop_path//\$/\\\$}
 desktop_path=${desktop_path//\`/\\\`}
 desktop_path=${desktop_path//%/%%}
-cat > "$staging/game.desktop" <<DESKTOP
+cat > "$applications/$app_id.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Command & Conquer: Omarchy Edition
-Comment=Build a base and battle The Walled Garden in Package Conflict
+Comment=Bundled Omarchy skirmish — custom units vs The Walled Garden
 Exec="$desktop_path/launch.sh"
-Icon=openra-ra
+Icon=$app_dir/current/mods/ra/icon.png
 Terminal=false
 Categories=Game;StrategyGame;
-Keywords=Omarchy;OpenRA;Skirmish;
+Keywords=Omarchy;Package Conflict;
 DESKTOP
-atomic_install "$staging/game.desktop" "$applications/$app_id.desktop" 644
-# Capture the exact installation paths; removal never searches other OpenRA data.
+# Keep the legacy map backup/remover available without invoking it automatically.
+if [[ -f "$app_dir/map-path" && -f "$app_dir/uninstall.sh" && ! -f "$app_dir/uninstall-legacy.sh" ]]; then
+  cp "$app_dir/uninstall.sh" "$app_dir/uninstall-legacy.sh"
+fi
 {
   printf '#!/usr/bin/env bash\nset -euo pipefail\napp_dir=%q\ndesktop=%q\n' "$app_dir" "$applications/$app_id.desktop"
   cat <<'REMOVE'
 [[ $(id -u) != 0 ]] || { echo 'Run without sudo.' >&2; exit 1; }
-map_path=$(cat "$app_dir/map-path")
-sha=$(cat "$app_dir/map-sha256")
-if [[ -e "$map_path" ]]; then
-  if ! printf '%s  %s\n' "$sha" "$map_path" | sha256sum --check --status; then
-    echo "Map changed since installation; keeping it and the backup. Move it aside and retry: $map_path" >&2
-    exit 1
-  fi
-  rm -- "$map_path"
-fi
-if [[ -f "$app_dir/previous.oramap" ]]; then
-  cp -p -- "$app_dir/previous.oramap" "$map_path"
-fi
-rm -f -- "$desktop" "$app_dir/launch.sh" "$app_dir/map-path" "$app_dir/map-sha256" "$app_dir/previous.oramap" "$app_dir/uninstall.sh"
-rm -rf -- "$app_dir/mods"
-rmdir -- "$app_dir" 2>/dev/null || true
-command -v update-desktop-database >/dev/null && update-desktop-database "$(dirname -- "$desktop")" || true
-echo 'Removed Omarchy Edition. OpenRA, its content, saves and other maps were kept.'
+rm -f -- "$desktop" "$app_dir/launch.sh" "$app_dir/current" "$app_dir/uninstall.sh"
+rm -rf -- "$app_dir/releases"
+echo 'Removed the bundled game. Content, saves and any older OpenRA installation were kept.'
 REMOVE
-} > "$staging/uninstall.sh"
-atomic_install "$staging/uninstall.sh" "$app_dir/uninstall.sh" 755
+} > "$app_dir/uninstall.sh"
+chmod 755 "$app_dir/uninstall.sh"
 command -v update-desktop-database >/dev/null && update-desktop-database "$applications" || true
-echo 'Installed Command & Conquer: Omarchy Edition in your app menu.'
-echo 'First launch: let OpenRA install Red Alert content if prompted.'
-echo 'Omarchy opens directly into the Package Conflict skirmish lobby.'
-echo 'Take the green slot and add Normal AI to the pink Walled Garden slot.'
-printf 'Uninstall: bash %q\n' "$app_dir/uninstall.sh"
-if [[ $mode == install ]]; then
-  "$app_dir/launch.sh"
-fi
+echo "Installed bundled Omarchy Edition $version; all 91 faction roster entries verified."
+echo 'First launch may ask to download Red Alert terrain and sounds.'
+printf 'Launch: bash %q\n' "$app_dir/launch.sh"
+if [[ $mode == install ]]; then "$app_dir/launch.sh"; fi
 exit 0
 __OMARCHY_PAYLOAD__

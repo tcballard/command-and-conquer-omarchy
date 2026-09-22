@@ -7,7 +7,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,12 +53,28 @@ jobs:
           export MOD_SEARCH_PATHS="$GITHUB_WORKSPACE/engine/mods,$GITHUB_WORKSPACE/build/mods"
           ./utility.sh omarchy --check-omarchy
           ./utility.sh omarchy --check-yaml
+      - name: Publish self-contained Linux engine
+        working-directory: engine
+        run: dotnet publish -c Release -p:TargetPlatform=linux-x64 -p:CopyGenericLauncher=True -p:CopyCncDll=True -p:CopyD2kDll=False -r linux-x64 -p:PublishDir="$GITHUB_WORKSPACE/build/runtime" --self-contained true
+      - name: Stage and verify the bundled Omarchy game
+        run: |
+          python tools/build_bundle.py engine build/runtime
+          cd build/bundle
+          export ENGINE_DIR="$PWD" MOD_SEARCH_PATHS="$PWD/mods" TREAT_WARNINGS_AS_ERRORS=true
+          ./OpenRA.Utility omarchy --check-omarchy
+          ./OpenRA.Utility omarchy --check-yaml
       - name: Build single-file installer
         run: |
           python tools/build_installer.py
           bash -n packaging/install.sh.in
           bash -n build/install-omarchy-edition.sh
           cd build && sha256sum --check install-omarchy-edition.sh.sha256
+      - name: Install actual release into a clean home and verify it
+        run: |
+          export XDG_DATA_HOME="$RUNNER_TEMP/omarchy clean home/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/omarchy clean home/config"
+          bash build/install-omarchy-edition.sh --no-launch
+          bash "$XDG_DATA_HOME/command-and-conquer-omarchy/launch.sh" --verify
       - name: Lint packaged skirmish against OpenRA
         working-directory: engine
         env:
@@ -101,7 +117,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag=v0.0.1-preview.2
+          tag=v0.0.1-preview.3
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Preview already exists; leaving its assets untouched."
             exit 0
@@ -114,5 +130,5 @@ jobs:
             preview/install-omarchy-edition.sh.sha256 \
             preview/omarchy-skirmish.oramap \
             --target "$GITHUB_SHA" --prerelease \
-            --title 'Omarchy Edition — Omarchy-only skirmish preview' \
+            --title 'Omarchy Edition — bundled engine and custom roster' \
             --notes-file packaging/PREVIEW-NOTES.md
