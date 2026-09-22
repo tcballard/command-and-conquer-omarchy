@@ -344,7 +344,12 @@ Engine built from the release-20250330 tag with .NET SDK 6.0.428
    * the pontoon bridge and both bases render correctly;
    * at 6:20 the first wave (two Floating Windows, six Party Cadres) is
      inside the base shelling the ISO — the timed script and pathing through
-     the ford work.
+     the ford work;
+   * left unattended (no player orders) the wave destroyed the ISO and the
+     engine ended the game with "Mission: Failed", the primary and the
+     "Keep the ISO alive" objectives crossed out — the lose path works end
+     to end (`screenshots/10-mission-failed-unattended.png`). The 18:00
+     GNOME Shell beat was therefore not observed in-engine.
    Two fixes came out of this:
    * `campaign-tooltips.yaml` is no longer in the rules chain. It makes every
      enemy building/unit show a generic "Enemy Structure"/"Enemy Unit" name,
