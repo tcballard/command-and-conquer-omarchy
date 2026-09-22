@@ -1,44 +1,42 @@
-# Red Alert: Omarchy Edition
+# Command & Conquer: Omarchy Edition
 
-A single scripted single-player mission for stock OpenRA Red Alert
-(release-20250330): the Omarchians versus the Commies. One `.oramap`, no
-engine changes, no bundled art. Text, numbers and a Lua script only.
+Build the ISO. Harvest packages. Send DHH and the coding agents to deal
+with the Central Planning Compositor.
 
-* `omarchy-edition.oramap` — the deliverable. See `INSTALL.md`.
-* `omarchy-edition/` — the unzipped source (`map.yaml`, `map.bin`,
-  `map.png`, `rules.yaml`, `sequences.yaml`, `omarchysign.shp`,
-  `omarchy.ftl`, `omarchy.lua`).
-* `tools/roster.py` — **every name and tooltip in the game, one table per
-  side.** Edit this, rebuild, done.
-* `tools/build_map.py` — deterministic generator for `map.bin`, `map.yaml`,
-  `map.png`, the logo sprite, and (via `build_text.py` / `build_icons.py`)
-  `omarchy.ftl`, `rules.yaml`, `sequences.yaml` and the 43 sidebar icons;
-  `tools/package.sh` regenerates and zips. Requires Python 3, Pillow, and
-  two build-time inputs that are not committed:
-  `OMARCHY_PAL=/path/to/temperat.pal` (extract from the game content with
-  `utility.sh ra --extract temperat.pal`) and `OMARCHY_FONTS=/dir/with/JetBrainsMono-*.ttf`
-  (SIL OFL, https://github.com/JetBrains/JetBrainsMono).
-* `NOTES.md` — what was verified against the engine source, what was not,
-  deviations, confidence.
+An Omarchy-themed **OpenRA Red Alert skirmish**, built for fun: green
+Omarchians against the Commies, terminal-style build icons, and a roster
+of familiar desktop tools with rather more firepower.
 
-Rebuild:
+The new **Package Conflict** map gives both sides room to build, equal ore
+fields and normal skirmish AI. No scripted waves or campaign countdown.
+It is the next playable prototype; a full match on the XPS is still needed
+to check the balance and presentation.
 
-```sh
-OMARCHY_PAL=~/temperat.pal OMARCHY_FONTS=~/fonts/ttf sh tools/package.sh
-```
+**[Build and play the skirmish →](SKIRMISH.md)**
 
-Lint with an engine checkout at tag release-20250330:
+Requires OpenRA Red Alert `release-20250330` and its game content. This
+uses the original Red Alert foundation, not Red Alert 2 or Yuri's Revenge.
 
-```sh
-TREAT_WARNINGS_AS_ERRORS=true ./utility.sh ra --check-yaml /path/to/omarchy-edition.oramap
-```
+## What it looks like so far
 
-## In-engine screenshots
-
-Captured from the real OpenRA client (release-20250330, software OpenGL under
-Xvfb) running this map; see `screenshots/` and NOTES.md step 4.7.
+These screenshots are from the earlier mission prototype. They show the
+shared roster and custom icons, not the new skirmish battlefield.
 
 | | |
 |---|---|
-| ![base](screenshots/01-omarchian-base.png) | ![wave](screenshots/08-first-wave-hits-the-iso.png) |
-| ![bridge](screenshots/06-pontoon-bridge-fog-off.png) | ![commies](screenshots/09-compositor-tooltip-fog-off.png) |
+| ![Omarchian base in the mission prototype](screenshots/01-omarchian-base.png) | ![Themed build menu in the mission prototype](screenshots/12-agent-terminal-build-tooltip.png) |
+
+Units and buildings still use stock Red Alert battlefield artwork. Original
+Omarchy unit and building sprites are a possible next step.
+
+## Make it yours
+
+`tools/roster.py` holds the names and descriptions. `tools/build_skirmish.py`
+builds the map using the committed sidebar artwork, with Python and Pillow.
+Changing the icon artwork still uses the existing palette/font workflow in
+`tools/build_icons.py`.
+
+The earlier mission and its build tools remain in `omarchy-edition/`;
+[INSTALL.md](INSTALL.md) covers that archived prototype and
+[NOTES.md](NOTES.md) records its development history. Current skirmish scope
+and testing limits are in [SKIRMISH.md](SKIRMISH.md).

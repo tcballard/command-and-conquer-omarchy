@@ -1,5 +1,12 @@
 # NOTES — Red Alert: Omarchy Edition
 
+> Historical mission-development notes. The project now targets skirmish;
+> see SKIRMISH.md for its implementation and validation status. The dated
+> iterations below include superseded statements: the later client runs
+> supersede the old claims of no display/client testing, the green colour
+> supersedes blue, and the third-iteration roster supersedes earlier names.
+> Recorded mission checks do not validate the new skirmish.
+
 Everything below was checked against a fresh clone of
 https://github.com/OpenRA/OpenRA at tag **release-20250330**
 (commit tagged 2025-03-30; the tag list on the remote goes
@@ -496,3 +503,4 @@ sub-faction-gated) to make sure no stock icon survives; that found
 | Looks good | low-medium | plain water next to plain grass except around the bridge; trees are random scatter |
 | Balance | low | untested by design |
 | INSTALL.md paths | high | derived from mod.yaml, Platform.cs and the Arch PKGBUILD |
+
