@@ -50,8 +50,9 @@ jobs:
         run: |
           ./utility.sh ra --png ../build/omarchy-skirmish/omarchy-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
           ./utility.sh ra --png ../build/omarchy-skirmish/commie-yard.shp ../build/omarchy-skirmish/omarchy-art.pal
-          test "$(find . -maxdepth 1 -name 'omarchy-yard-*.png' | wc -l)" -eq 34
-          test "$(find . -maxdepth 1 -name 'commie-yard-*.png' | wc -l)" -eq 34
+          # OpenRA omits the fully transparent first deployment frame (index 2).
+          test "$(find . -maxdepth 1 -name 'omarchy-yard-*.png' | wc -l)" -eq 33
+          test "$(find . -maxdepth 1 -name 'commie-yard-*.png' | wc -l)" -eq 33
       - uses: actions/upload-artifact@v4
         with:
           name: omarchy-skirmish
