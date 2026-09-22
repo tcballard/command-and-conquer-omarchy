@@ -25,7 +25,9 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import build_art  # noqa: E402  (logo sprite + preview image)
+import build_art    # noqa: E402  (logo sprite + preview image)
+import build_icons  # noqa: E402  (sidebar icons)
+import build_text   # noqa: E402  (omarchy.ftl / rules.yaml / sequences.yaml from roster.py)
 OUT_DIR = os.path.join(os.path.dirname(HERE), "omarchy-edition")
 
 W = H = 64
@@ -154,13 +156,14 @@ def is_clear(tiles, x, y):
 FOOTPRINTS = {
     "fact": (3, 4), "fact.commie": (3, 4),
     "powr": (2, 3), "powr.commie": (2, 3),
-    "apwr": (3, 3),
+    "apwr": (3, 3), "apwr.commie": (3, 3),
     "proc": (3, 4),
     "tent": (2, 3), "barr": (2, 3),
     "weap": (3, 3), "weap.commie": (3, 3),
     "iron": (2, 2),
     "tsla": (1, 1), "ftur": (1, 1), "kenn": (1, 1), "brik": (1, 1),
     "omarchy.sign": (3, 3),   # map-defined decoration (rules.yaml OMARCHY.SIGN)
+    "dome.commie": (2, 3), "stek": (3, 3), "sam": (2, 1),
 }
 # Trees: T01..T07 use footprint "__ x_" (2x2, only the bottom-left cell is occupied).
 TREE_TYPES = ["t01", "t02", "t03", "t04", "t05", "t06", "t07"]
@@ -225,11 +228,11 @@ def place_actors(tiles):
 
     # ---- Omarchian base (bottom-left) -------------------------------------
     a.building("fact", 12, 47, "Omarchy", name="ISO")
-    a.building("powr", 8, 47, "Omarchy")
-    a.building("powr", 8, 51, "Omarchy")
-    a.building("proc", 17, 47, "Omarchy")       # spawns the free pacman -Syu truck (FreeActor)
-    a.building("tent", 12, 52, "Omarchy")
-    a.building("weap", 16, 52, "Omarchy")
+    a.building("powr", 8, 47, "Omarchy", name="Power1")
+    a.building("powr", 8, 51, "Omarchy", name="Power2")
+    a.building("proc", 17, 47, "Omarchy", name="Mirror")       # spawns the free truck (FreeActor)
+    a.building("tent", 12, 52, "Omarchy", name="Menu")
+    a.building("weap", 16, 52, "Omarchy", name="Factory")
     a.building("omarchy.sign", 7, 42, "Omarchy", name="Sign")   # Omarchy logo painted on the ground
 
     a.unit("e1", 11, 44, "Omarchy", facing=0, subcell=1)
@@ -246,19 +249,23 @@ def place_actors(tiles):
     # ---- The Commies (top-right), walled ----------------------------------
     a.building("fact.commie", 50, 6, "Commies", name="Compositor")
     a.building("iron", 55, 7, "Commies", name="FiveYearPlan")
-    a.building("apwr", 44, 4, "Commies")
-    a.building("apwr", 56, 12, "Commies")
-    a.building("powr.commie", 47, 4, "Commies")
-    a.building("powr.commie", 58, 4, "Commies")
-    a.building("powr.commie", 54, 10, "Commies")
-    a.building("barr", 44, 9, "Commies")
-    a.building("weap.commie", 48, 12, "Commies")
-    a.building("kenn", 53, 13, "Commies")
-    a.building("tsla", 42, 14, "Commies")
-    a.building("tsla", 46, 18, "Commies")
-    a.building("tsla", 52, 19, "Commies")
-    a.building("ftur", 41, 10, "Commies")
-    a.building("ftur", 55, 19, "Commies")
+    a.building("apwr.commie", 44, 4, "Commies", name="Flatpak1")
+    a.building("apwr.commie", 56, 12, "Commies", name="Flatpak2")
+    a.building("powr.commie", 47, 4, "Commies", name="Snapd1")
+    a.building("powr.commie", 58, 4, "Commies", name="Snapd2")
+    a.building("powr.commie", 54, 10, "Commies", name="Snapd3")
+    a.building("barr", 44, 9, "Commies", name="Forum")
+    a.building("weap.commie", 48, 12, "Commies", name="ElectronFactory")
+    a.building("dome.commie", 57, 16, "Commies", name="TelemetryDome")
+    a.building("stek", 40, 5, "Commies", name="Committee")
+    a.building("kenn", 53, 13, "Commies", name="Kennel")
+    a.building("tsla", 42, 14, "Commies", name="Coil1")
+    a.building("tsla", 46, 18, "Commies", name="Coil2")
+    a.building("tsla", 52, 19, "Commies", name="Coil3")
+    a.building("ftur", 41, 10, "Commies", name="FlameWar1")
+    a.building("ftur", 55, 19, "Commies", name="FlameWar2")
+    a.building("sam", 43, 21, "Commies", name="Captcha1")
+    a.building("sam", 56, 21, "Commies", name="Captcha2")
 
     # Brick wall: west side x=39 (gate at y=15,16), south side y=23 (gate at x=48,49)
     for y in range(4, 24):
@@ -271,7 +278,7 @@ def place_actors(tiles):
         a.building("brik", x, 23, "Commies")
 
     for (x, y, f) in [(41, 15, 768), (41, 16, 768), (47, 21, 512), (50, 21, 512), (45, 20, 512), (43, 12, 768)]:
-        a.unit("e1.cadre", x, y, "Commies", facing=f, subcell=1)
+        a.unit("e1.commie", x, y, "Commies", facing=f, subcell=1)
     a.unit("3tnk", 44, 16, "Commies", facing=640)
     a.unit("3tnk", 50, 17, "Commies", facing=640)
     a.unit("dog", 53, 15, "Commies", facing=512, subcell=1)
@@ -483,6 +490,20 @@ def main():
     res, ore_cells = place_ore(tiles, actors)
     write_bin(os.path.join(OUT_DIR, "map.bin"), tiles, res)
     write_yaml(os.path.join(OUT_DIR, "map.yaml"), actors)
+
+    # Strings, rules and sidebar icons from tools/roster.py
+    pal = os.environ.get("OMARCHY_PAL")
+    fonts = os.environ.get("OMARCHY_FONTS")
+    if not pal or not fonts:
+        raise SystemExit("set OMARCHY_PAL (temperat.pal extracted with `utility.sh ra --extract temperat.pal`) "
+                         "and OMARCHY_FONTS (directory with JetBrainsMono-Bold.ttf / -Regular.ttf)")
+    icon_seqs, _sheet = build_icons.build_icons(OUT_DIR, pal, fonts)
+    with open(os.path.join(OUT_DIR, "omarchy.ftl"), "w") as f:
+        f.write(build_text.ftl())
+    with open(os.path.join(OUT_DIR, "rules.yaml"), "w") as f:
+        f.write(build_text.rules())
+    with open(os.path.join(OUT_DIR, "sequences.yaml"), "w") as f:
+        f.write(build_text.sequences(icon_seqs))
 
     # Art: the Omarchy logo as a 3x3-cell ground sign (72x72 px) and the locked map preview.
     sign_px = 24 * FOOTPRINTS["omarchy.sign"][0]

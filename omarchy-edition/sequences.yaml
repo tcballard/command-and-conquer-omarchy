@@ -1,3 +1,175 @@
 omarchysign:
 	idle:
 		Filename: omarchysign.shp
+
+mcv:
+	icon:
+		Filename: omarchy-mcv-icon.shp
+
+fact:
+	icon:
+		Filename: omarchy-fact-icon.shp
+
+powr:
+	icon:
+		Filename: omarchy-powr-icon.shp
+
+apwr:
+	icon:
+		Filename: omarchy-apwr-icon.shp
+
+proc:
+	icon:
+		Filename: omarchy-proc-icon.shp
+
+silo:
+	icon:
+		Filename: omarchy-silo-icon.shp
+
+tent:
+	icon:
+		Filename: omarchy-tent-icon.shp
+
+weap:
+	icon:
+		Filename: omarchy-weap-icon.shp
+
+dome:
+	icon:
+		Filename: omarchy-dome-icon.shp
+
+fix:
+	icon:
+		Filename: omarchy-fix-icon.shp
+
+atek:
+	icon:
+		Filename: omarchy-atek-icon.shp
+
+pdox:
+	icon:
+		Filename: omarchy-pdox-icon.shp
+
+gap:
+	icon:
+		Filename: omarchy-gap-icon.shp
+
+pbox:
+	icon:
+		Filename: omarchy-pbox-icon.shp
+
+hbox:
+	icon:
+		Filename: omarchy-hbox-icon.shp
+
+gun:
+	icon:
+		Filename: omarchy-gun-icon.shp
+
+agun:
+	icon:
+		Filename: omarchy-agun-icon.shp
+
+sbag:
+	icon:
+		Filename: omarchy-sbag-icon.shp
+
+fenc:
+	icon:
+		Filename: omarchy-fenc-icon.shp
+
+brik:
+	icon:
+		Filename: omarchy-brik-icon.shp
+
+hpad:
+	icon:
+		Filename: omarchy-hpad-icon.shp
+
+mslo:
+	icon:
+		Filename: omarchy-mslo-icon.shp
+
+e1:
+	icon:
+		Filename: omarchy-e1-icon.shp
+
+e3:
+	icon:
+		Filename: omarchy-e3-icon.shp
+
+e6:
+	icon:
+		Filename: omarchy-e6-icon.shp
+
+medi:
+	icon:
+		Filename: omarchy-medi-icon.shp
+
+mech:
+	icon:
+		Filename: omarchy-mech-icon.shp
+
+spy:
+	icon:
+		Filename: omarchy-spy-icon.shp
+
+thf:
+	icon:
+		Filename: omarchy-thf-icon.shp
+
+e7:
+	icon:
+		Filename: omarchy-e7-icon.shp
+
+jeep:
+	icon:
+		Filename: omarchy-jeep-icon.shp
+
+1tnk:
+	icon:
+		Filename: omarchy-1tnk-icon.shp
+
+2tnk:
+	icon:
+		Filename: omarchy-2tnk-icon.shp
+
+arty:
+	icon:
+		Filename: omarchy-arty-icon.shp
+
+apc:
+	icon:
+		Filename: omarchy-apc-icon.shp
+
+mnly:
+	icon:
+		Filename: omarchy-mnly-icon.shp
+
+ctnk:
+	icon:
+		Filename: omarchy-ctnk-icon.shp
+
+mgg:
+	icon:
+		Filename: omarchy-mgg-icon.shp
+
+harv:
+	icon:
+		Filename: omarchy-harv-icon.shp
+
+heli:
+	icon:
+		Filename: omarchy-heli-icon.shp
+
+tran:
+	icon:
+		Filename: omarchy-tran-icon.shp
+
+mh60:
+	icon:
+		Filename: omarchy-mh60-icon.shp
+
+mrj:
+	icon:
+		Filename: omarchy-mrj-icon.shp

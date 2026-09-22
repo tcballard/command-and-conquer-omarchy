@@ -7,25 +7,40 @@
    AddPrimaryObjective and AddSecondaryObjective.
 ]]
 
+PlanMinutes = 30
+
 HoundTypes = { "dog", "dog", "dog", "dog" }
-Wave1Types = { "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "3tnk", "3tnk" }
-Wave2ChokeTypes = { "3tnk", "3tnk", "3tnk", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre", "v2rl" }
-Wave2BridgeTypes = { "3tnk", "3tnk", "e1.cadre", "e1.cadre", "e1.cadre", "e1.cadre" }
-GnomeEscortTypes = { "3tnk", "3tnk", "e1.cadre", "e1.cadre" }
-AlacrittyTypes = { "1tnk", "1tnk", "1tnk" }
+Wave1Types = { "e1.commie", "e1.commie", "e1.commie", "e1.commie", "e1.commie", "e1.commie", "3tnk", "3tnk" }
+Wave2ChokeTypes = { "3tnk", "3tnk", "3tnk", "e1.commie", "e1.commie", "e1.commie", "e2", "e2", "e3.commie", "v2rl" }
+Wave2BridgeTypes = { "3tnk", "3tnk", "e1.commie", "e1.commie", "e1.commie", "e1.commie" }
+GnomeEscortTypes = { "3tnk", "3tnk", "shok", "shok" }
+Wave3ChokeTypes = { "3tnk", "3tnk", "3tnk", "ttnk", "v2rl", "v2rl", "e1.commie", "e1.commie", "e2", "e2", "e4", "e4" }
+Wave3BridgeTypes = { "3tnk", "3tnk", "ftrk", "e1.commie", "e1.commie", "e3.commie", "e3.commie" }
+TankReinforcements = { "1tnk", "1tnk", "1tnk" }
+HeroReinforcements = { "e7" }
 
 ChokePath = { SovietSpawn.Location, ChokePoint.Location }
 BridgePath = { SovietSpawn.Location, BridgeNorth.Location, BridgeSouth.Location }
 WestPath = { WestEntry.Location, WestRally.Location }
 
--- Reinforce a Soviet group along `path`; once each unit reaches the end of the
+InfantryLossLines = { "omarchy-msg-infantry-lost-1", "omarchy-msg-infantry-lost-2", "omarchy-msg-infantry-lost-3" }
+VehicleLossLines = { "omarchy-msg-vehicle-lost-1", "omarchy-msg-vehicle-lost-2" }
+InfantryLosses = 0
+VehicleLosses = 0
+AgentLaunched = false
+
+Say = function(text, prefixKey)
+	Media.DisplayMessage(text, UserInterface.GetFluentMessage(prefixKey))
+end
+
+-- Reinforce a Commie group along `path`; once each unit reaches the end of the
 -- path it attack-moves on the ISO and then hunts whatever is left.
-SendSovietWave = function(types, path, interval)
+SendCommieWave = function(types, path, interval)
 	if Compositor.IsDead then
 		return
 	end
 
-	Reinforcements.Reinforce(USSR, types, path, interval, function(unit)
+	Reinforcements.Reinforce(Commies, types, path, interval, function(unit)
 		if not ISO.IsDead then
 			unit.AttackMove(ISO.Location)
 		end
@@ -33,7 +48,7 @@ SendSovietWave = function(types, path, interval)
 	end)
 end
 
--- t = 2:00. Four Systemd Hounds go for the pacman -Syu truck.
+-- t = 2:00. Four Systemd Hounds go for the truck.
 -- Stock dogs cannot bite vehicles (DogJaw only targets infantry), so they
 -- sprint to the truck's position and maul whoever is guarding it.
 SendHounds = function()
@@ -41,11 +56,11 @@ SendHounds = function()
 		return
 	end
 
-	Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-hounds"), UserInterface.GetFluentMessage("omarchy-prefix-cpc"))
+	Say(UserInterface.GetFluentMessage("omarchy-msg-hounds"), "omarchy-prefix-cpc")
 	Media.PlaySpeechNotification(Omarchy, "EnemyUnitsApproaching")
 
 	local trucks = Omarchy.GetActorsByType("harv")
-	Reinforcements.Reinforce(USSR, HoundTypes, ChokePath, 10, function(hound)
+	Reinforcements.Reinforce(Commies, HoundTypes, ChokePath, 10, function(hound)
 		if #trucks > 0 and not trucks[1].IsDead then
 			hound.AttackMove(trucks[1].Location)
 		elseif not ISO.IsDead then
@@ -61,16 +76,28 @@ SendFirstWave = function()
 		return
 	end
 
-	Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-wave1"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
+	Say(UserInterface.GetFluentMessage("omarchy-msg-wave1"), "omarchy-prefix-omarchy")
 	Media.PlaySpeechNotification(Omarchy, "SovietForcesApproaching")
-	SendSovietWave(Wave1Types, ChokePath, DateTime.Seconds(1))
+	SendCommieWave(Wave1Types, ChokePath, DateTime.Seconds(1))
 end
 
--- t = 8:00. Three Alacrittys roll in from the western map edge.
-SendAlacrittys = function()
+-- t = 8:00. Three light tanks roll in from the western map edge.
+SendTanks = function()
 	Media.PlaySpeechNotification(Omarchy, "ReinforcementsArrived")
-	Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-reinforce"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
-	Reinforcements.Reinforce(Omarchy, AlacrittyTypes, WestPath, DateTime.Seconds(1))
+	Say(UserInterface.GetFluentMessage("omarchy-msg-reinforce"), "omarchy-prefix-omarchy")
+	local tanks = Reinforcements.Reinforce(Omarchy, TankReinforcements, WestPath, DateTime.Seconds(1))
+	Utils.Do(tanks, WatchOmarchianUnit)
+end
+
+-- t = 10:00. DHH arrives. One per distribution.
+SendHero = function()
+	Say(UserInterface.GetFluentMessage("omarchy-msg-dhh"), "omarchy-prefix-omarchy")
+	local heroes = Reinforcements.Reinforce(Omarchy, HeroReinforcements, WestPath, DateTime.Seconds(1))
+	Utils.Do(heroes, function(hero)
+		Trigger.OnKilled(hero, function()
+			Say(UserInterface.GetFluentMessage("omarchy-msg-dhh-dead"), "omarchy-prefix-omarchy")
+		end)
+	end)
 end
 
 -- t = 12:00. Progress report, reveal the Compositor, and a two-pronged wave
@@ -80,10 +107,10 @@ FiveYearPlanUpdate = function()
 		return
 	end
 
-	Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-plan60"), UserInterface.GetFluentMessage("omarchy-prefix-cpc"))
+	Say(UserInterface.GetFluentMessage("omarchy-msg-plan60"), "omarchy-prefix-cpc")
 	Actor.Create("camera", true, { Owner = Omarchy, Location = Compositor.Location })
-	SendSovietWave(Wave2ChokeTypes, ChokePath, DateTime.Seconds(1))
-	SendSovietWave(Wave2BridgeTypes, BridgePath, DateTime.Seconds(1))
+	SendCommieWave(Wave2ChokeTypes, ChokePath, DateTime.Seconds(1))
+	SendCommieWave(Wave2BridgeTypes, BridgePath, DateTime.Seconds(1))
 end
 
 -- t = 18:00. The Five-Year Plan makes a GNOME Shell (Mammoth) invulnerable and
@@ -94,14 +121,14 @@ ReleaseGnomeShell = function()
 		return
 	end
 
-	local gnome = Actor.Create("4tnk", true, { Owner = USSR, Location = SovietSpawn.Location })
+	local gnome = Actor.Create("4tnk", true, { Owner = Commies, Location = SovietSpawn.Location })
 	if not FiveYearPlan.IsDead then
 		gnome.GrantCondition("invulnerability", DateTime.Seconds(45))
 		Media.PlaySound("ironcur9.aud")
 		Media.PlaySpeechNotification(Omarchy, "IronCurtainReady")
-		Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-gnome"), UserInterface.GetFluentMessage("omarchy-prefix-cpc"))
+		Say(UserInterface.GetFluentMessage("omarchy-msg-gnome"), "omarchy-prefix-cpc")
 	else
-		Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-gnome-cancelled"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
+		Say(UserInterface.GetFluentMessage("omarchy-msg-gnome-cancelled"), "omarchy-prefix-omarchy")
 	end
 
 	gnome.AttackMove(ChokePoint.Location)
@@ -110,7 +137,77 @@ ReleaseGnomeShell = function()
 	end
 	IdleHunt(gnome)
 
-	SendSovietWave(GnomeEscortTypes, ChokePath, DateTime.Seconds(1))
+	SendCommieWave(GnomeEscortTypes, ChokePath, DateTime.Seconds(1))
+end
+
+-- t = 24:00. Everything the Committee has left.
+SendFinalWave = function()
+	if Compositor.IsDead then
+		return
+	end
+
+	Say(UserInterface.GetFluentMessage("omarchy-msg-wave3"), "omarchy-prefix-cpc")
+	Media.PlaySpeechNotification(Omarchy, "SovietForcesApproaching")
+	SendCommieWave(Wave3ChokeTypes, ChokePath, DateTime.Seconds(1))
+	SendCommieWave(Wave3BridgeTypes, BridgePath, DateTime.Seconds(1))
+end
+
+-- The Five-Year Plan clock. Destroying the Iron Curtain stops it.
+PlanCompleted = function()
+	if Compositor.IsDead or FiveYearPlan.IsDead then
+		return
+	end
+
+	Say(UserInterface.GetFluentMessage("omarchy-msg-plan-done"), "omarchy-prefix-cpc")
+	Omarchy.MarkFailedObjective(DestroyCompositorObjective)
+end
+
+PlanCancelled = function()
+	DateTime.TimeLimit = 0
+	UserInterface.SetMissionText("")
+	Say(UserInterface.GetFluentMessage("omarchy-msg-plan-cancelled"), "omarchy-prefix-omarchy")
+	Omarchy.MarkCompletedObjective(CancelPlanObjective)
+end
+
+-- Reactive lines for our own losses. Capped so the chat does not drown.
+WatchOmarchianUnit = function(unit)
+	if unit.Owner ~= Omarchy or not unit.HasProperty("Health") then
+		return
+	end
+
+	Trigger.OnKilled(unit, function()
+		if unit.Type == "harv" then
+			Say(UserInterface.GetFluentMessage("omarchy-msg-truck-lost"), "omarchy-prefix-omarchy")
+		elseif unit.Type == "heli" then
+			Say(UserInterface.GetFluentMessage("omarchy-msg-agent-lost"), "omarchy-prefix-omarchy")
+		elseif unit.Type == "e7" then
+			return -- handled in SendHero
+		elseif unit.HasProperty("Move") and (unit.Type == "e1" or unit.Type == "e3" or unit.Type == "e6" or unit.Type == "medi" or unit.Type == "mech" or unit.Type == "spy" or unit.Type == "thf") then
+			InfantryLosses = InfantryLosses + 1
+			if InfantryLosses <= #InfantryLossLines then
+				Say(UserInterface.GetFluentMessage(InfantryLossLines[InfantryLosses]), "omarchy-prefix-omarchy")
+			end
+		elseif unit.HasProperty("Move") then
+			VehicleLosses = VehicleLosses + 1
+			if VehicleLosses <= #VehicleLossLines then
+				Say(UserInterface.GetFluentMessage(VehicleLossLines[VehicleLosses]), "omarchy-prefix-omarchy")
+			end
+		end
+	end)
+end
+
+-- Lines for named buildings on both sides.
+WatchBuilding = function(building, key, prefixKey, extra)
+	if not building or building.IsDead then
+		return
+	end
+
+	Trigger.OnKilled(building, function()
+		Say(UserInterface.GetFluentMessage(key), prefixKey)
+		if extra then
+			extra()
+		end
+	end)
 end
 
 -- The pontoon bridge is spawned by the engine from the tile templates, so its
@@ -122,56 +219,104 @@ WatchBridge = function()
 
 	if #pieces > 0 then
 		Trigger.OnAnyKilled(pieces, function()
-			Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-bridge"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
+			Say(UserInterface.GetFluentMessage("omarchy-msg-bridge"), "omarchy-prefix-omarchy")
 		end)
 	end
 end
 
 Tick = function()
 	if Omarchy.HasNoRequiredUnits() then
-		USSR.MarkCompletedObjective(USSRObjective)
+		Commies.MarkCompletedObjective(CommiesObjective)
 	end
 end
 
 WorldLoaded = function()
 	Omarchy = Player.GetPlayer("Omarchy")
-	USSR = Player.GetPlayer("Commies")
+	Commies = Player.GetPlayer("Commies")
 
 	InitObjectives(Omarchy)
 
-	USSRObjective = AddPrimaryObjective(USSR, "")
+	CommiesObjective = AddPrimaryObjective(Commies, "")
 	DestroyCompositorObjective = AddPrimaryObjective(Omarchy, "omarchy-objective-compositor")
 	KeepISOObjective = AddSecondaryObjective(Omarchy, "omarchy-objective-iso")
 	CancelPlanObjective = AddSecondaryObjective(Omarchy, "omarchy-objective-plan")
 
+	-- Win / lose
 	Trigger.OnKilledOrCaptured(Compositor, function()
-		Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-win"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
+		Say(UserInterface.GetFluentMessage("omarchy-msg-win"), "omarchy-prefix-omarchy")
+		DateTime.TimeLimit = 0
+		UserInterface.SetMissionText("")
 		if not ISO.IsDead then
 			Omarchy.MarkCompletedObjective(KeepISOObjective)
 		end
 		Omarchy.MarkCompletedObjective(DestroyCompositorObjective)
 	end)
 
-	Trigger.OnKilledOrCaptured(FiveYearPlan, function()
-		Omarchy.MarkCompletedObjective(CancelPlanObjective)
-	end)
-
 	Trigger.OnKilled(ISO, function()
-		Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-lose"), UserInterface.GetFluentMessage("omarchy-prefix-omarchy"))
+		Say(UserInterface.GetFluentMessage("omarchy-msg-lose"), "omarchy-prefix-omarchy")
 		Omarchy.MarkFailedObjective(KeepISOObjective)
 		Omarchy.MarkFailedObjective(DestroyCompositorObjective)
 	end)
 
-	Trigger.AfterDelay(DateTime.Seconds(1), WatchBridge)
+	-- The clock
+	DateTime.TimeLimit = DateTime.Minutes(PlanMinutes)
+	Trigger.OnTimerExpired(PlanCompleted)
+	Trigger.OnKilledOrCaptured(FiveYearPlan, PlanCancelled)
+
+	-- Reactive lines: our buildings
+	WatchBuilding(Power1, "omarchy-msg-powr-lost", "omarchy-prefix-omarchy")
+	WatchBuilding(Power2, "omarchy-msg-powr-lost", "omarchy-prefix-omarchy")
+	WatchBuilding(Mirror, "omarchy-msg-proc-lost", "omarchy-prefix-omarchy")
+	WatchBuilding(Menu, "omarchy-msg-tent-lost", "omarchy-prefix-omarchy")
+	WatchBuilding(Factory, "omarchy-msg-weap-lost", "omarchy-prefix-omarchy")
+
+	-- Reactive lines: their buildings
+	WatchBuilding(Snapd1, "omarchy-msg-cpowr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Snapd2, "omarchy-msg-cpowr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Snapd3, "omarchy-msg-cpowr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Flatpak1, "omarchy-msg-capwr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Flatpak2, "omarchy-msg-capwr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Forum, "omarchy-msg-barr-lost", "omarchy-prefix-cpc")
+	WatchBuilding(ElectronFactory, "omarchy-msg-cweap-lost", "omarchy-prefix-cpc")
+	WatchBuilding(TelemetryDome, "omarchy-msg-cdome-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Kennel, "omarchy-msg-kenn-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Committee, "omarchy-msg-stek-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Coil1, "omarchy-msg-tsla-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Coil2, "omarchy-msg-tsla-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Coil3, "omarchy-msg-tsla-lost", "omarchy-prefix-cpc")
+	WatchBuilding(FlameWar1, "omarchy-msg-ftur-lost", "omarchy-prefix-cpc")
+	WatchBuilding(FlameWar2, "omarchy-msg-ftur-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Captcha1, "omarchy-msg-sam-lost", "omarchy-prefix-cpc")
+	WatchBuilding(Captcha2, "omarchy-msg-sam-lost", "omarchy-prefix-cpc")
+
+	-- Reactive lines: units, both pre-placed and produced later
+	Utils.Do(Omarchy.GetActors(), WatchOmarchianUnit)
+	Trigger.OnAnyProduction(function(producer, produced, productionType)
+		if produced.Owner ~= Omarchy then
+			return
+		end
+		if produced.Type == "heli" and not AgentLaunched then
+			AgentLaunched = true
+			Say(UserInterface.GetFluentMessage("omarchy-msg-agent-first"), "omarchy-prefix-omarchy")
+		end
+		WatchOmarchianUnit(produced)
+	end)
+
+	Trigger.AfterDelay(DateTime.Seconds(1), function()
+		WatchBridge()
+		Utils.Do(Omarchy.GetActorsByType("harv"), WatchOmarchianUnit)
+	end)
 	Trigger.AfterDelay(DateTime.Seconds(3), function()
-		Media.DisplayMessage(UserInterface.GetFluentMessage("omarchy-msg-decree"), UserInterface.GetFluentMessage("omarchy-prefix-cpc"))
+		Say(UserInterface.GetFluentMessage("omarchy-msg-decree"), "omarchy-prefix-cpc")
 	end)
 
 	Trigger.AfterDelay(DateTime.Minutes(2), SendHounds)
 	Trigger.AfterDelay(DateTime.Minutes(5), SendFirstWave)
-	Trigger.AfterDelay(DateTime.Minutes(8), SendAlacrittys)
+	Trigger.AfterDelay(DateTime.Minutes(8), SendTanks)
+	Trigger.AfterDelay(DateTime.Minutes(10), SendHero)
 	Trigger.AfterDelay(DateTime.Minutes(12), FiveYearPlanUpdate)
 	Trigger.AfterDelay(DateTime.Minutes(18), ReleaseGnomeShell)
+	Trigger.AfterDelay(DateTime.Minutes(24), SendFinalWave)
 
 	Camera.Position = ISO.CenterPosition
 end

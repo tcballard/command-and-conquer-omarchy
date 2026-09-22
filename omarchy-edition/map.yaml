@@ -47,54 +47,54 @@ Actors:
 	ISO: fact
 		Location: 12,47
 		Owner: Omarchy
-	Actor1: powr
+	Power1: powr
 		Location: 8,47
 		Owner: Omarchy
-	Actor2: powr
+	Power2: powr
 		Location: 8,51
 		Owner: Omarchy
-	Actor3: proc
+	Mirror: proc
 		Location: 17,47
 		Owner: Omarchy
-	Actor4: tent
+	Menu: tent
 		Location: 12,52
 		Owner: Omarchy
-	Actor5: weap
+	Factory: weap
 		Location: 16,52
 		Owner: Omarchy
 	Sign: omarchy.sign
 		Location: 7,42
 		Owner: Omarchy
-	Actor6: e1
+	Actor1: e1
 		Location: 11,44
 		Owner: Omarchy
 		SubCell: 1
 		Facing: 0
-	Actor7: e1
+	Actor2: e1
 		Location: 12,44
 		Owner: Omarchy
 		SubCell: 1
 		Facing: 0
-	Actor8: e1
+	Actor3: e1
 		Location: 13,44
 		Owner: Omarchy
 		SubCell: 1
 		Facing: 0
-	Actor9: e3
+	Actor4: e3
 		Location: 15,44
 		Owner: Omarchy
 		SubCell: 1
 		Facing: 0
-	Actor10: e3
+	Actor5: e3
 		Location: 16,44
 		Owner: Omarchy
 		SubCell: 1
 		Facing: 0
-	Actor11: 1tnk
+	Actor6: 1tnk
 		Location: 14,42
 		Owner: Omarchy
 		Facing: 0
-	Actor12: 1tnk
+	Actor7: 1tnk
 		Location: 18,42
 		Owner: Omarchy
 		Facing: 0
@@ -110,194 +110,206 @@ Actors:
 	FiveYearPlan: iron
 		Location: 55,7
 		Owner: Commies
-	Actor13: apwr
+	Flatpak1: apwr.commie
 		Location: 44,4
 		Owner: Commies
-	Actor14: apwr
+	Flatpak2: apwr.commie
 		Location: 56,12
 		Owner: Commies
-	Actor15: powr.commie
+	Snapd1: powr.commie
 		Location: 47,4
 		Owner: Commies
-	Actor16: powr.commie
+	Snapd2: powr.commie
 		Location: 58,4
 		Owner: Commies
-	Actor17: powr.commie
+	Snapd3: powr.commie
 		Location: 54,10
 		Owner: Commies
-	Actor18: barr
+	Forum: barr
 		Location: 44,9
 		Owner: Commies
-	Actor19: weap.commie
+	ElectronFactory: weap.commie
 		Location: 48,12
 		Owner: Commies
-	Actor20: kenn
+	TelemetryDome: dome.commie
+		Location: 57,16
+		Owner: Commies
+	Committee: stek
+		Location: 40,5
+		Owner: Commies
+	Kennel: kenn
 		Location: 53,13
 		Owner: Commies
-	Actor21: tsla
+	Coil1: tsla
 		Location: 42,14
 		Owner: Commies
-	Actor22: tsla
+	Coil2: tsla
 		Location: 46,18
 		Owner: Commies
-	Actor23: tsla
+	Coil3: tsla
 		Location: 52,19
 		Owner: Commies
-	Actor24: ftur
+	FlameWar1: ftur
 		Location: 41,10
 		Owner: Commies
-	Actor25: ftur
+	FlameWar2: ftur
 		Location: 55,19
 		Owner: Commies
-	Actor26: brik
+	Captcha1: sam
+		Location: 43,21
+		Owner: Commies
+	Captcha2: sam
+		Location: 56,21
+		Owner: Commies
+	Actor8: brik
 		Location: 39,4
 		Owner: Commies
-	Actor27: brik
+	Actor9: brik
 		Location: 39,5
 		Owner: Commies
-	Actor28: brik
+	Actor10: brik
 		Location: 39,6
 		Owner: Commies
-	Actor29: brik
+	Actor11: brik
 		Location: 39,7
 		Owner: Commies
-	Actor30: brik
+	Actor12: brik
 		Location: 39,8
 		Owner: Commies
-	Actor31: brik
+	Actor13: brik
 		Location: 39,9
 		Owner: Commies
-	Actor32: brik
+	Actor14: brik
 		Location: 39,10
 		Owner: Commies
-	Actor33: brik
+	Actor15: brik
 		Location: 39,11
 		Owner: Commies
-	Actor34: brik
+	Actor16: brik
 		Location: 39,12
 		Owner: Commies
-	Actor35: brik
+	Actor17: brik
 		Location: 39,13
 		Owner: Commies
-	Actor36: brik
+	Actor18: brik
 		Location: 39,14
 		Owner: Commies
-	Actor37: brik
+	Actor19: brik
 		Location: 39,17
 		Owner: Commies
-	Actor38: brik
+	Actor20: brik
 		Location: 39,18
 		Owner: Commies
-	Actor39: brik
+	Actor21: brik
 		Location: 39,19
 		Owner: Commies
-	Actor40: brik
+	Actor22: brik
 		Location: 39,20
 		Owner: Commies
-	Actor41: brik
+	Actor23: brik
 		Location: 39,21
 		Owner: Commies
-	Actor42: brik
+	Actor24: brik
 		Location: 39,22
 		Owner: Commies
-	Actor43: brik
+	Actor25: brik
 		Location: 39,23
 		Owner: Commies
-	Actor44: brik
+	Actor26: brik
 		Location: 40,23
 		Owner: Commies
-	Actor45: brik
+	Actor27: brik
 		Location: 41,23
 		Owner: Commies
-	Actor46: brik
+	Actor28: brik
 		Location: 42,23
 		Owner: Commies
-	Actor47: brik
+	Actor29: brik
 		Location: 43,23
 		Owner: Commies
-	Actor48: brik
+	Actor30: brik
 		Location: 44,23
 		Owner: Commies
-	Actor49: brik
+	Actor31: brik
 		Location: 45,23
 		Owner: Commies
-	Actor50: brik
+	Actor32: brik
 		Location: 46,23
 		Owner: Commies
-	Actor51: brik
+	Actor33: brik
 		Location: 47,23
 		Owner: Commies
-	Actor52: brik
+	Actor34: brik
 		Location: 50,23
 		Owner: Commies
-	Actor53: brik
+	Actor35: brik
 		Location: 51,23
 		Owner: Commies
-	Actor54: brik
+	Actor36: brik
 		Location: 52,23
 		Owner: Commies
-	Actor55: brik
+	Actor37: brik
 		Location: 53,23
 		Owner: Commies
-	Actor56: brik
+	Actor38: brik
 		Location: 54,23
 		Owner: Commies
-	Actor57: brik
+	Actor39: brik
 		Location: 55,23
 		Owner: Commies
-	Actor58: brik
+	Actor40: brik
 		Location: 56,23
 		Owner: Commies
-	Actor59: brik
+	Actor41: brik
 		Location: 57,23
 		Owner: Commies
-	Actor60: brik
+	Actor42: brik
 		Location: 58,23
 		Owner: Commies
-	Actor61: e1.cadre
+	Actor43: e1.commie
 		Location: 41,15
 		Owner: Commies
 		SubCell: 1
 		Facing: 768
-	Actor62: e1.cadre
+	Actor44: e1.commie
 		Location: 41,16
 		Owner: Commies
 		SubCell: 1
 		Facing: 768
-	Actor63: e1.cadre
+	Actor45: e1.commie
 		Location: 47,21
 		Owner: Commies
 		SubCell: 1
 		Facing: 512
-	Actor64: e1.cadre
+	Actor46: e1.commie
 		Location: 50,21
 		Owner: Commies
 		SubCell: 1
 		Facing: 512
-	Actor65: e1.cadre
+	Actor47: e1.commie
 		Location: 45,20
 		Owner: Commies
 		SubCell: 1
 		Facing: 512
-	Actor66: e1.cadre
+	Actor48: e1.commie
 		Location: 43,12
 		Owner: Commies
 		SubCell: 1
 		Facing: 768
-	Actor67: 3tnk
+	Actor49: 3tnk
 		Location: 44,16
 		Owner: Commies
 		Facing: 640
-	Actor68: 3tnk
+	Actor50: 3tnk
 		Location: 50,17
 		Owner: Commies
 		Facing: 640
-	Actor69: dog
+	Actor51: dog
 		Location: 53,15
 		Owner: Commies
 		SubCell: 1
 		Facing: 512
-	Actor70: dog
+	Actor52: dog
 		Location: 54,15
 		Owner: Commies
 		SubCell: 1
@@ -314,160 +326,160 @@ Actors:
 	BridgeSouth: waypoint
 		Location: 37,50
 		Owner: Neutral
-	Actor71: t02
+	Actor53: t02
 		Location: 2,17
 		Owner: Neutral
-	Actor72: t02
+	Actor54: t02
 		Location: 2,36
 		Owner: Neutral
-	Actor73: t01
+	Actor55: t01
 		Location: 2,48
 		Owner: Neutral
-	Actor74: t06
+	Actor56: t06
 		Location: 3,14
 		Owner: Neutral
-	Actor75: t06
+	Actor57: t06
 		Location: 3,32
 		Owner: Neutral
-	Actor76: t01
+	Actor58: t01
 		Location: 4,30
 		Owner: Neutral
-	Actor77: t03
+	Actor59: t03
 		Location: 4,38
 		Owner: Neutral
-	Actor78: t07
+	Actor60: t07
 		Location: 6,25
 		Owner: Neutral
-	Actor79: t05
+	Actor61: t05
 		Location: 6,36
 		Owner: Neutral
-	Actor80: t01
+	Actor62: t01
 		Location: 7,11
 		Owner: Neutral
-	Actor81: t06
+	Actor63: t06
 		Location: 7,23
 		Owner: Neutral
-	Actor82: t03
+	Actor64: t03
 		Location: 7,28
 		Owner: Neutral
-	Actor83: t02
+	Actor65: t02
 		Location: 8,30
 		Owner: Neutral
-	Actor84: t03
+	Actor66: t03
 		Location: 9,23
 		Owner: Neutral
-	Actor85: t02
+	Actor67: t02
 		Location: 11,39
 		Owner: Neutral
-	Actor86: t07
+	Actor68: t07
 		Location: 12,7
 		Owner: Neutral
-	Actor87: t06
+	Actor69: t06
 		Location: 12,37
 		Owner: Neutral
-	Actor88: t02
+	Actor70: t02
 		Location: 13,2
 		Owner: Neutral
-	Actor89: t05
+	Actor71: t05
 		Location: 13,4
 		Owner: Neutral
-	Actor90: t06
+	Actor72: t06
 		Location: 13,26
 		Owner: Neutral
-	Actor91: t05
+	Actor73: t05
 		Location: 13,33
 		Owner: Neutral
-	Actor92: t07
+	Actor74: t07
 		Location: 14,33
 		Owner: Neutral
-	Actor93: t03
+	Actor75: t03
 		Location: 17,24
 		Owner: Neutral
-	Actor94: t02
+	Actor76: t02
 		Location: 19,25
 		Owner: Neutral
-	Actor95: t01
+	Actor77: t01
 		Location: 19,31
 		Owner: Neutral
-	Actor96: t05
+	Actor78: t05
 		Location: 19,33
 		Owner: Neutral
-	Actor97: t01
+	Actor79: t01
 		Location: 20,9
 		Owner: Neutral
-	Actor98: t05
+	Actor80: t05
 		Location: 20,26
 		Owner: Neutral
-	Actor99: t02
+	Actor81: t02
 		Location: 21,4
 		Owner: Neutral
-	Actor100: t06
+	Actor82: t06
 		Location: 22,3
 		Owner: Neutral
-	Actor101: t03
+	Actor83: t03
 		Location: 22,9
 		Owner: Neutral
-	Actor102: t06
+	Actor84: t06
 		Location: 23,13
 		Owner: Neutral
-	Actor103: t06
+	Actor85: t06
 		Location: 23,18
 		Owner: Neutral
-	Actor104: t03
+	Actor86: t03
 		Location: 24,17
 		Owner: Neutral
-	Actor105: t04
+	Actor87: t04
 		Location: 26,20
 		Owner: Neutral
-	Actor106: t03
+	Actor88: t03
 		Location: 28,33
 		Owner: Neutral
-	Actor107: t02
+	Actor89: t02
 		Location: 30,4
 		Owner: Neutral
-	Actor108: t04
+	Actor90: t04
 		Location: 30,13
 		Owner: Neutral
-	Actor109: t03
+	Actor91: t03
 		Location: 30,17
 		Owner: Neutral
-	Actor110: t04
+	Actor92: t04
 		Location: 30,18
 		Owner: Neutral
-	Actor111: t06
+	Actor93: t06
 		Location: 31,20
 		Owner: Neutral
-	Actor112: t01
+	Actor94: t01
 		Location: 31,25
 		Owner: Neutral
-	Actor113: t01
+	Actor95: t01
 		Location: 33,3
 		Owner: Neutral
-	Actor114: t02
+	Actor96: t02
 		Location: 33,24
 		Owner: Neutral
-	Actor115: t04
+	Actor97: t04
 		Location: 33,25
 		Owner: Neutral
-	Actor116: t06
+	Actor98: t06
 		Location: 34,10
 		Owner: Neutral
-	Actor117: t06
+	Actor99: t06
 		Location: 34,22
 		Owner: Neutral
-	Actor118: t02
+	Actor100: t02
 		Location: 34,26
 		Owner: Neutral
-	Actor119: t04
+	Actor101: t04
 		Location: 35,26
 		Owner: Neutral
-	Actor120: t01
+	Actor102: t01
 		Location: 37,58
 		Owner: Neutral
-	Actor121: t01
+	Actor103: t01
 		Location: 53,27
 		Owner: Neutral
-	Actor122: t04
+	Actor104: t04
 		Location: 55,60
 		Owner: Neutral
 

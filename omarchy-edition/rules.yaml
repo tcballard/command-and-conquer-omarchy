@@ -8,11 +8,24 @@ World:
 	LuaScript:
 		Scripts: campaign.lua, utils.lua, omarchy.lua
 	MissionData:
-		Briefing: Comrade DHH has fled. The Central Planning Compositor has decreed that all windows shall float.\n\nEstablish the ISO, sync your packages, and destroy the Compositor before the Five-Year Plan completes.\n\nThe Commies hold the far side of the river. One ford, one pontoon bridge. Both are watched.
+		Briefing: Comrade DHH has fled. The Central Planning Compositor has decreed that all windows shall float, and the Five-Year Plan that makes it permanent completes in thirty minutes.\n\nEstablish the ISO, sync your packages, and destroy the Compositor before then. Destroying the Five-Year Plan itself cancels the clock.\n\nThe Commies hold the far side of the river. One ford, one pontoon bridge. Both are watched. This isn't a grab bag of preinstalled units: zero bloat, just everything you need.
 	Faction@allies:
 		Name: faction-omarchians.name
 	Faction@soviet:
 		Name: faction-commies.name
+	TimeLimitManager:
+		CountdownLabel: MISSION_TEXT
+		CountdownText: Five-Year Plan completes in {0}
+		Notification: {0} minute{1} until all windows float
+		SkipTimerExpiredNotification: True
+
+# ---- Omarchians -------------------------------------------------------
+
+MCV:
+	Tooltip:
+		Name: omarchy-mcv.name
+	Buildable:
+		Description: omarchy-mcv.description
 
 FACT:
 	Tooltip:
@@ -20,33 +33,29 @@ FACT:
 	Buildable:
 		Description: omarchy-fact.description
 
-FACT.COMMIE:
-	Inherits: FACT
-	Tooltip:
-		Name: commie-fact.name
-	RenderSprites:
-		Image: fact
-
 POWR:
 	Tooltip:
 		Name: omarchy-powr.name
 	Buildable:
 		Description: omarchy-powr.description
 
-POWR.COMMIE:
-	Inherits: POWR
+APWR:
 	Tooltip:
-		Name: actor-powr.name
+		Name: omarchy-apwr.name
 	Buildable:
-		Prerequisites: ~disabled
-	RenderSprites:
-		Image: powr
+		Description: omarchy-apwr.description
 
 PROC:
 	Tooltip:
 		Name: omarchy-proc.name
 	Buildable:
 		Description: omarchy-proc.description
+
+SILO:
+	Tooltip:
+		Name: omarchy-silo.name
+	Buildable:
+		Description: omarchy-silo.description
 
 TENT:
 	Tooltip:
@@ -60,55 +69,150 @@ WEAP:
 	Buildable:
 		Description: omarchy-weap.description
 
-WEAP.COMMIE:
-	Inherits: WEAP
+DOME:
 	Tooltip:
-		Name: actor-weap.name
+		Name: omarchy-dome.name
 	Buildable:
-		Prerequisites: ~disabled
-	RenderSprites:
-		Image: weap
+		Description: omarchy-dome.description
+
+FIX:
+	Tooltip:
+		Name: omarchy-fix.name
+	Buildable:
+		Description: omarchy-fix.description
+
+ATEK:
+	Tooltip:
+		Name: omarchy-atek.name
+	Buildable:
+		Description: omarchy-atek.description
 
 PDOX:
 	Tooltip:
 		Name: omarchy-pdox.name
 	Buildable:
 		Description: omarchy-pdox.description
+	ChronoshiftPower@chronoshift:
+		Name: omarchy-power-pdox.name
+		Description: omarchy-power-pdox.description
 
-IRON:
+GAP:
 	Tooltip:
-		Name: commie-iron.name
-
-HARV:
-	Tooltip:
-		Name: omarchy-harv.name
+		Name: omarchy-gap.name
 	Buildable:
-		Description: omarchy-harv.description
+		Description: omarchy-gap.description
 
-MCV:
+PBOX:
 	Tooltip:
-		Name: omarchy-mcv.name
+		Name: omarchy-pbox.name
+	Buildable:
+		Description: omarchy-pbox.description
+
+HBOX:
+	Tooltip:
+		Name: omarchy-hbox.name
+	Buildable:
+		Description: omarchy-hbox.description
+
+GUN:
+	Tooltip:
+		Name: omarchy-gun.name
+	Buildable:
+		Description: omarchy-gun.description
+
+AGUN:
+	Tooltip:
+		Name: omarchy-agun.name
+	Buildable:
+		Description: omarchy-agun.description
+
+SBAG:
+	Tooltip:
+		Name: omarchy-sbag.name
+	Buildable:
+		Description: omarchy-sbag.description
+
+FENC:
+	Tooltip:
+		Name: omarchy-fenc.name
+	Buildable:
+		Description: omarchy-fenc.description
+
+BRIK:
+	Tooltip:
+		Name: omarchy-brik.name
+	Buildable:
+		Description: omarchy-brik.description
+
+HPAD:
+	Tooltip:
+		Name: omarchy-hpad.name
+	Buildable:
+		Description: omarchy-hpad.description
+
+MSLO:
+	Tooltip:
+		Name: omarchy-mslo.name
+	Buildable:
+		Description: omarchy-mslo.description
+	NukePower:
+		Name: omarchy-power-mslo.name
+		Description: omarchy-power-mslo.description
 
 E1:
 	Tooltip:
 		Name: omarchy-e1.name
-
-E1.CADRE:
-	Inherits: E1
-	Tooltip:
-		Name: commie-e1.name
 	Buildable:
-		Prerequisites: ~disabled
-	RenderSprites:
-		Image: e1
+		Description: omarchy-e1.description
 
 E3:
 	Tooltip:
 		Name: omarchy-e3.name
+	Buildable:
+		Description: omarchy-e3.description
 
-DOG:
+E6:
 	Tooltip:
-		Name: commie-dog.name
+		Name: omarchy-e6.name
+	Buildable:
+		Description: omarchy-e6.description
+
+MEDI:
+	Tooltip:
+		Name: omarchy-medi.name
+	Buildable:
+		Description: omarchy-medi.description
+
+MECH:
+	Tooltip:
+		Name: omarchy-mech.name
+	Buildable:
+		Description: omarchy-mech.description
+
+SPY:
+	Tooltip:
+		Name: omarchy-spy.name
+	Buildable:
+		Description: omarchy-spy.description
+
+THF:
+	Tooltip:
+		Name: omarchy-thf.name
+	Buildable:
+		Description: omarchy-thf.description
+
+E7:
+	Tooltip:
+		Name: omarchy-e7.name
+	Buildable:
+		Description: omarchy-e7.description
+		Prerequisites: ~disabled
+
+JEEP:
+	Tooltip:
+		Name: omarchy-jeep.name
+	Buildable:
+		Description: omarchy-jeep.description
 
 1TNK:
 	Tooltip:
@@ -121,16 +225,394 @@ DOG:
 2TNK:
 	Tooltip:
 		Name: omarchy-2tnk.name
+	Buildable:
+		Description: omarchy-2tnk.description
+
+ARTY:
+	Tooltip:
+		Name: omarchy-arty.name
+	Buildable:
+		Description: omarchy-arty.description
+
+APC:
+	Tooltip:
+		Name: omarchy-apc.name
+	Buildable:
+		Description: omarchy-apc.description
+
+MNLY:
+	Tooltip:
+		Name: omarchy-mnly.name
+	Buildable:
+		Description: omarchy-mnly.description
+
+CTNK:
+	Tooltip:
+		Name: omarchy-ctnk.name
+	Buildable:
+		Description: omarchy-ctnk.description
+
+MGG:
+	Tooltip:
+		Name: omarchy-mgg.name
+	Buildable:
+		Description: omarchy-mgg.description
+
+HARV:
+	Tooltip:
+		Name: omarchy-harv.name
+	Buildable:
+		Description: omarchy-harv.description
+
+HELI:
+	Tooltip:
+		Name: omarchy-heli.name
+	Buildable:
+		Description: omarchy-heli.description
+
+TRAN:
+	Tooltip:
+		Name: omarchy-tran.name
+	Buildable:
+		Description: omarchy-tran.description
+
+MH60:
+	Tooltip:
+		Name: omarchy-mh60.name
+	Buildable:
+		Description: omarchy-mh60.description
+
+MRJ:
+	Tooltip:
+		Name: omarchy-mrj.name
+	Buildable:
+		Description: omarchy-mrj.description
+
+# ---- Omakase: not in Omarchy, not in the menu ---------------------------
+
+SYRD:
+	Buildable:
+		Prerequisites: ~disabled
+
+PT:
+	Buildable:
+		Prerequisites: ~disabled
+
+DD:
+	Buildable:
+		Prerequisites: ~disabled
+
+CA:
+	Buildable:
+		Prerequisites: ~disabled
+
+LST:
+	Buildable:
+		Prerequisites: ~disabled
+
+MSUB:
+	Buildable:
+		Prerequisites: ~disabled
+
+SS:
+	Buildable:
+		Prerequisites: ~disabled
+
+SPEN:
+	Buildable:
+		Prerequisites: ~disabled
+
+TRUK:
+	Buildable:
+		Prerequisites: ~disabled
+
+# ---- The Commies -------------------------------------------------------
+
+FACT.COMMIE:
+	Inherits: FACT
+	Tooltip:
+		Name: commie-fact.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: fact
+	TooltipDescription:
+		Description: commie-fact.description
+
+POWR.COMMIE:
+	Inherits: POWR
+	Tooltip:
+		Name: commie-powr.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: powr
+	TooltipDescription:
+		Description: commie-powr.description
+
+APWR.COMMIE:
+	Inherits: APWR
+	Tooltip:
+		Name: commie-apwr.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: apwr
+	TooltipDescription:
+		Description: commie-apwr.description
+
+BARR:
+	Tooltip:
+		Name: commie-barr.name
+	TooltipDescription:
+		Description: commie-barr.description
+
+WEAP.COMMIE:
+	Inherits: WEAP
+	Tooltip:
+		Name: commie-weap.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: weap
+	TooltipDescription:
+		Description: commie-weap.description
+
+DOME.COMMIE:
+	Inherits: DOME
+	Tooltip:
+		Name: commie-dome.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: dome
+	TooltipDescription:
+		Description: commie-dome.description
+
+FIX.COMMIE:
+	Inherits: FIX
+	Tooltip:
+		Name: commie-fix.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: fix
+	TooltipDescription:
+		Description: commie-fix.description
+
+STEK:
+	Tooltip:
+		Name: commie-stek.name
+	TooltipDescription:
+		Description: commie-stek.description
+
+KENN:
+	Tooltip:
+		Name: commie-kenn.name
+	TooltipDescription:
+		Description: commie-kenn.description
+
+IRON:
+	Tooltip:
+		Name: commie-iron.name
+	TooltipDescription:
+		Description: commie-iron.description
+
+FTUR:
+	Tooltip:
+		Name: commie-ftur.name
+	TooltipDescription:
+		Description: commie-ftur.description
+
+SAM:
+	Tooltip:
+		Name: commie-sam.name
+	TooltipDescription:
+		Description: commie-sam.description
+
+AFLD:
+	Tooltip:
+		Name: commie-afld.name
+	TooltipDescription:
+		Description: commie-afld.description
+
+MSLO.COMMIE:
+	Inherits: MSLO
+	Tooltip:
+		Name: commie-mslo.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: mslo
+	TooltipDescription:
+		Description: commie-mslo.description
+
+BRIK.COMMIE:
+	Inherits: BRIK
+	Tooltip:
+		Name: commie-brik.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: brik
+	TooltipDescription:
+		Description: commie-brik.description
+
+E1.COMMIE:
+	Inherits: E1
+	Tooltip:
+		Name: commie-e1.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: e1
+
+E2:
+	Tooltip:
+		Name: commie-e2.name
+	TooltipDescription:
+		Description: commie-e2.description
+
+E3.COMMIE:
+	Inherits: E3
+	Tooltip:
+		Name: commie-e3.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: e3
+	TooltipDescription:
+		Description: commie-e3.description
+
+E4:
+	Tooltip:
+		Name: commie-e4.name
+
+SHOK:
+	Tooltip:
+		Name: commie-shok.name
+	TooltipDescription:
+		Description: commie-shok.description
+
+E6.COMMIE:
+	Inherits: E6
+	Tooltip:
+		Name: commie-e6.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: e6
+	TooltipDescription:
+		Description: commie-e6.description
+
+DOG:
+	Tooltip:
+		Name: commie-dog.name
+
+SPY.COMMIE:
+	Inherits: SPY
+	Tooltip:
+		Name: commie-spy.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: spy
 
 3TNK:
 	Tooltip:
 		Name: commie-3tnk.name
 	Mobile:
 		Speed: 58
+	TooltipDescription:
+		Description: commie-3tnk.description
 
 4TNK:
 	Tooltip:
 		Name: commie-4tnk.name
+	TooltipDescription:
+		Description: commie-4tnk.description
+
+V2RL:
+	Tooltip:
+		Name: commie-v2rl.name
+	TooltipDescription:
+		Description: commie-v2rl.description
+
+FTRK:
+	Tooltip:
+		Name: commie-ftrk.name
+	TooltipDescription:
+		Description: commie-ftrk.description
+
+TTNK:
+	Tooltip:
+		Name: commie-ttnk.name
+	TooltipDescription:
+		Description: commie-ttnk.description
+
+APC.COMMIE:
+	Inherits: APC
+	Tooltip:
+		Name: commie-apc.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: apc
+
+MNLY.COMMIE:
+	Inherits: MNLY
+	Tooltip:
+		Name: commie-mnly.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: mnly
+	TooltipDescription:
+		Description: commie-mnly.description
+
+MCV.COMMIE:
+	Inherits: MCV
+	Tooltip:
+		Name: commie-mcv.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: mcv
+	TooltipDescription:
+		Description: commie-mcv.description
+
+HARV.COMMIE:
+	Inherits: HARV
+	Tooltip:
+		Name: commie-harv.name
+	Buildable:
+		Prerequisites: ~disabled
+	RenderSprites:
+		Image: harv
+
+MIG:
+	Tooltip:
+		Name: commie-mig.name
+	TooltipDescription:
+		Description: commie-mig.description
+
+YAK:
+	Tooltip:
+		Name: commie-yak.name
+	TooltipDescription:
+		Description: commie-yak.description
+
+HIND:
+	Tooltip:
+		Name: commie-hind.name
+
+BADR:
+	Tooltip:
+		Name: commie-badr.name
+	TooltipDescription:
+		Description: commie-badr.description
+
+# ---- Decoration ---------------------------------------------------------
 
 OMARCHY.SIGN:
 	Inherits@1: ^SpriteActor

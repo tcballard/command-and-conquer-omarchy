@@ -365,6 +365,94 @@ Engine built from the release-20250330 tag with .NET SDK 6.0.428
    `c89be1b60f548fd2b0d81e20eb2f127ee662cdff` (lint clean, warnings as
    errors).
 
+## The full set (third iteration)
+
+Everything renamable is now driven by **`tools/roster.py`**, one table per
+side, from which `tools/build_text.py` generates `omarchy.ftl` and
+`rules.yaml`, `tools/build_icons.py` generates the sidebar icons and
+`sequences.yaml`, and `tools/build_map.py` ties it together. Change a name
+in the roster, run `tools/package.sh`, done.
+
+Ground truth for the names is the Omarchy manual in the repo
+(`basecamp/omarchy`, `manual/*.md`, read 2026-09-22) and its base package
+list (`install/omarchy-base.packages`). That corrected the first delivery:
+Omarchy today ships Quickshell (the "Omarchy shell": bar, menu,
+notifications, lock screen), the Foot terminal by default with Alacritty,
+Ghostty and Kitty optional, bash with Starship, Tmux and Herdr, Neovim,
+Chromium, Docker with Lazydocker, mise-managed AI coding agents as
+first-class citizens, `omarchy update` (alias `mup`) with a snapshot first
+and an explicit warning against running `pacman -Syu` yourself. There is no
+Waybar, Walker or Mako any more, and no zsh. Every hotkey quoted in a
+tooltip is copied from `manual/07-hotkeys.md` or the chapter for that tool.
+
+Decisions taken with the user: agents are the air force (Helipad = Agent
+Terminal, Longbow = Coding Agent), Tesla Coil keeps its name, naval is
+removed rather than renamed (`OMARCHY_REMOVED`: `~disabled`, the allies-02
+idiom), DHH is the hero unit (Tanya, arrives by script at 10:00, not
+buildable). Two still open and marked in the roster: Foot vs Alacritty for
+the light tank, and `omarchy update` vs `pacman -Syu` for the truck; the
+build currently uses the proposal (Foot / omarchy update).
+
+### Sidebar icons
+
+Red Alert bakes the unit name into each 64x48 build icon (`*icon.shp`,
+drawn with the `chrome` palette = `temperat.pal`), so the stock menu said
+POWER PLANT under a thing called Hyprland. Every Omarchian buildable now has
+a generated icon: a Tokyo Night terminal tile with the name in JetBrains
+Mono (SIL OFL, Omarchy's font) and the Red Alert role in dim text, quantised
+to the palette and written as `.shp` by the same writer as the logo sign.
+They are wired through a map-level `sequences.yaml` that overrides just the
+`icon` sequence of each image (map sequences merge onto the mod's:
+`SequenceSet(fileSystem, modData, tileSet, additionalSequences)`).
+The engine dims unavailable icons exactly as it does stock ones.
+
+Build-time inputs, not shipped: `temperat.pal` (extract from the game
+content with `utility.sh ra --extract temperat.pal`; it is EA data and is
+not committed) and the JetBrains Mono TTFs. `tools/build_map.py` reads
+their locations from `OMARCHY_PAL` and `OMARCHY_FONTS`. The generated
+`.shp` files *are* committed, so a rebuild without those inputs is only
+needed when names change.
+
+Every generic/Allied buildable in the RA rules was enumerated
+programmatically (Buildable without `~disabled`, not Soviet- or
+sub-faction-gated) to make sure no stock icon survives; that found
+`tran`, `mh60` and `mrj`, now Tmux, Herdr and Hide Bar.
+
+### Script (third iteration)
+
+* **Five-Year Plan clock**: `TimeLimitManager` (the allies-02 idiom) with
+  `DateTime.TimeLimit = 30 min`; the label reads "Five-Year Plan completes
+  in mm:ss". `Trigger.OnTimerExpired` fails the primary objective.
+  Destroying the Iron Curtain sets the limit to 0, clears the mission text
+  and completes the secondary objective, so the secondary objective now has
+  teeth.
+* Beats: 0:03 decree, 2:00 hounds, 5:00 wave 1 (ford), 8:00 three light
+  tanks from the west, 10:00 DHH, 12:00 60 % report plus split wave, 18:00
+  GNOME Shell under the Iron Curtain, 24:00 final wave on both routes.
+* Reactive lines: truck lost, first Coding Agent launched, agent lost, the
+  first three infantry and first two vehicle losses (capped, so the chat is
+  not spammed), each of our named buildings, and every named Commie
+  building (snapd, Flatpak, Forum, Electron Factory, Telemetry Dome,
+  systemd kennel, Design Committee, the coils, Flame Wars, CAPTCHAs).
+  Produced units are hooked through `Trigger.OnAnyProduction`.
+* Enemy tooltips now show a flavour line via `TooltipDescription` (the
+  trait campaign-tooltips.yaml removes from tech buildings), e.g.
+  "Central Planning Compositor / The Commies / All windows shall float."
+
+### Verified for this iteration
+
+* `--check-yaml` with warnings as errors: clean on the folder and on the
+  packed file (51 files, UID `335354bfa99e80473bb0e999c7b9ef468e79d9cb`).
+* Stubbed Lua 5.1 dry run: all 31 named actors the script references exist
+  in `map.yaml`, every Fluent key referenced exists, every beat and trigger
+  runs without error.
+* In-engine (Xvfb + llvmpipe, real client): countdown label live at the
+  top of the screen; generated icons on the structures, infantry, vehicle,
+  defence and aircraft tabs, dimmed when unavailable; build tooltips with
+  the new names and descriptions ("Agent Terminal — Requires Omarchy Bar.
+  Super + Shift + Ctrl + A. Launches your default agent."); enemy tooltip
+  with description. See `screenshots/`.
+
 ### What was NOT verified
 
 * No client run with the Red Alert assets and a display: I could not watch
