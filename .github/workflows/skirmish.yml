@@ -36,6 +36,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y liblua5.1-0 libsdl2-2.0-0 libopenal1 libfreetype6
       - name: Build pinned OpenRA
+        id: engine-build
         working-directory: engine
         run: |
           dotnet build -c Release -p:TargetPlatform=unix-generic
@@ -46,6 +47,7 @@ jobs:
           TREAT_WARNINGS_AS_ERRORS: 'true'
         run: ./utility.sh ra --check-yaml ../build/omarchy-skirmish.oramap
       - name: Decode and verify complete original roster with OpenRA
+        if: ${{ !cancelled() && steps.engine-build.outcome == 'success' }}
         run: python tools/verify_openra_art.py engine build/omarchy-skirmish
       - uses: actions/upload-artifact@v4
         with:

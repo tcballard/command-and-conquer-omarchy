@@ -135,15 +135,15 @@ World:
                 block+=f'\t{powers[actor][0]}:\n\t\tName: {prefix}-power-{actor}.name\n\t\tDescription: {prefix}-power-{actor}.description\n'
         out.append(block)
     # Sub-actors explicitly override stock Image fields rather than inheriting stock wrecks.
-    aliases={'E1R1':'e1','E3R1':'e3','SPY.ENGLAND':'spy','AFLD.UKRAINE':'afld','BADR.BOMBER':'badr',
-             '2TNK.HUSK':'2tnk','3TNK.HUSK':'3tnk','4TNK.HUSK':'4tnk','MCV.HUSK':'mcv',
-             'HARV.FULLHUSK':'harv','HARV.EMPTYHUSK':'harv','MGG.HUSK':'mgg',
-             'TRAN.HUSK':'tran','TRAN.HUSK1':'tran','TRAN.HUSK2':'tran',
-             'HELI.HUSK':'heli','MH60.HUSK':'mh60','HIND.HUSK':'hind','MIG.HUSK':'mig',
-             'YAK.HUSK':'yak','BADR.HUSK':'badr','U2.HUSK':'u2'}
+    aliases={'E1R1':'e1','E3R1':'e3','SPY.England':'spy','AFLD.Ukraine':'afld','BADR.Bomber':'badr',
+             '2TNK.Husk':'2tnk','3TNK.Husk':'3tnk','4TNK.Husk':'4tnk','MCV.Husk':'mcv',
+             'HARV.FullHusk':'harv','HARV.EmptyHusk':'harv','MGG.Husk':'mgg',
+             'TRAN.Husk':'tran','TRAN.Husk1':'tran','TRAN.Husk2':'tran',
+             'HELI.Husk':'heli','MH60.Husk':'mh60','HIND.Husk':'hind','MIG.Husk':'mig',
+             'YAK.Husk':'yak','BADR.Husk':'badr','U2.Husk':'u2'}
     for alias,actor in aliases.items():
         side='omarchy' if actor in ours else 'garden'
-        wreck='-wreck' if '.HUSK' in alias or 'HUSK' in alias else ''
+        wreck='-wreck' if 'husk' in alias.lower() else ''
         block=f'{alias}:\n\tRenderSprites:\n\t\tImage: {side}-{actor}{wreck}\n\t\tPlayerPalette: omarchy-player\n'
         if actor in ours and actor in theirs:
             block+='\t\tFactionImages:\n'

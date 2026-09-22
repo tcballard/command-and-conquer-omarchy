@@ -141,7 +141,7 @@ class SkirmishTests(unittest.TestCase):
         rules=sk.rules()
         self.assertIn('ImageByFullness:\n',rules)
         self.assertNotIn('WithHarvesterSpriteBody@',rules) # docking requires a single body
-        self.assertIn('HELI.HUSK:',rules)
+        self.assertIn('HELI.Husk:',rules)
         self.assertIn('garden-badr-wreck',rules)
 
 
