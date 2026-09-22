@@ -94,3 +94,7 @@ omarchy-msg-gnome-cancelled = The Five-Year Plan was cancelled. GNOME Shell arri
 omarchy-msg-bridge = The bridge is down. Somebody force-pushed to main.
 omarchy-msg-win = Windows are tiled. Order is restored.
 omarchy-msg-lose = The ISO is gone. Reinstall from scratch.
+
+## Decoration
+omarchy-sign =
+    .name = Omarchy

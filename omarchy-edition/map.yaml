@@ -16,6 +16,8 @@ Visibility: MissionSelector
 
 Categories: Campaign
 
+LockPreview: True
+
 Players:
 	PlayerReference@Neutral:
 		Name: Neutral
@@ -30,7 +32,7 @@ Players:
 		LockFaction: True
 		Faction: allies
 		LockColor: True
-		Color: 7AA2F7
+		Color: 9ECE6A
 		LockSpawn: True
 		LockTeam: True
 		Enemies: USSR
@@ -59,6 +61,9 @@ Actors:
 		Owner: Omarchy
 	Actor5: weap
 		Location: 16,52
+		Owner: Omarchy
+	Sign: omarchy.sign
+		Location: 7,42
 		Owner: Omarchy
 	Actor6: e1
 		Location: 11,44
@@ -467,5 +472,7 @@ Actors:
 		Owner: Neutral
 
 Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, rules.yaml
+
+Sequences: sequences.yaml
 
 FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, omarchy.ftl

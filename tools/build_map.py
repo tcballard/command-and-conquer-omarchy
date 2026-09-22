@@ -24,6 +24,8 @@ import struct
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import build_art  # noqa: E402  (logo sprite + preview image)
 OUT_DIR = os.path.join(os.path.dirname(HERE), "omarchy-edition")
 
 W = H = 64
@@ -158,6 +160,7 @@ FOOTPRINTS = {
     "weap": (3, 3), "weap.commie": (3, 3),
     "iron": (2, 2),
     "tsla": (1, 1), "ftur": (1, 1), "kenn": (1, 1), "brik": (1, 1),
+    "omarchy.sign": (3, 3),   # map-defined decoration (rules.yaml OMARCHY.SIGN)
 }
 # Trees: T01..T07 use footprint "__ x_" (2x2, only the bottom-left cell is occupied).
 TREE_TYPES = ["t01", "t02", "t03", "t04", "t05", "t06", "t07"]
@@ -168,26 +171,28 @@ class Actors:
         self.tiles = tiles
         self.entries = []
         self.reserved = {}
+        self.kinds = {}      # name -> (kind, owner), for the preview image
         self.counter = 0
 
-    def _reserve(self, cells, who):
+    def _reserve(self, cells, who, kind=None, owner=None):
         for c in cells:
             if c in self.reserved:
                 raise SystemExit(f"overlap at {c}: {who} vs {self.reserved[c]}")
             if not is_clear(self.tiles, *c):
                 raise SystemExit(f"{who} at {c} is not on clear terrain (tile {self.tiles[c[0]][c[1]]})")
             self.reserved[c] = who
+        self.kinds[who] = (kind, owner)
 
     def building(self, kind, x, y, owner, name=None):
         w, h = FOOTPRINTS[kind]
         cells = [(x + i, y + j) for i in range(w) for j in range(h)]
         name = name or self._auto()
-        self._reserve(cells, name)
+        self._reserve(cells, name, kind, owner)
         self.entries.append((name, kind, {"Location": f"{x},{y}", "Owner": owner}))
 
     def unit(self, kind, x, y, owner, facing=None, subcell=None, name=None):
         name = name or self._auto()
-        self._reserve([(x, y)], name)
+        self._reserve([(x, y)], name, kind, owner)
         props = {"Location": f"{x},{y}", "Owner": owner}
         if subcell is not None:
             props["SubCell"] = str(subcell)
@@ -203,7 +208,7 @@ class Actors:
     def tree(self, kind, x, y):
         # occupied cell is (x, y + 1); the Location is the footprint's top-left
         name = self._auto()
-        self._reserve([(x, y + 1)], name)
+        self._reserve([(x, y + 1)], name, kind, "Neutral")
         self.entries.append((name, kind, {"Location": f"{x},{y}", "Owner": "Neutral"}))
 
     def _auto(self):
@@ -225,6 +230,7 @@ def place_actors(tiles):
     a.building("proc", 17, 47, "Omarchy")       # spawns the free pacman -Syu truck (FreeActor)
     a.building("tent", 12, 52, "Omarchy")
     a.building("weap", 16, 52, "Omarchy")
+    a.building("omarchy.sign", 7, 42, "Omarchy", name="Sign")   # Omarchy logo painted on the ground
 
     a.unit("e1", 11, 44, "Omarchy", facing=0, subcell=1)
     a.unit("e1", 12, 44, "Omarchy", facing=0, subcell=1)
@@ -352,6 +358,8 @@ Visibility: MissionSelector
 
 Categories: Campaign
 
+LockPreview: True
+
 Players:
 	PlayerReference@Neutral:
 		Name: Neutral
@@ -366,7 +374,7 @@ Players:
 		LockFaction: True
 		Faction: allies
 		LockColor: True
-		Color: 7AA2F7
+		Color: 9ECE6A
 		LockSpawn: True
 		LockTeam: True
 		Enemies: USSR
@@ -382,6 +390,8 @@ Actors:
 
 MAP_YAML_TAIL = """
 Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, rules.yaml
+
+Sequences: sequences.yaml
 
 FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, omarchy.ftl
 """
@@ -427,6 +437,45 @@ def ascii_preview(tiles, res, actors):
     return "\n".join(rows)
 
 
+# Preview colours: TerrainType Color values from mods/ra/tilesets/temperat.yaml,
+# keyed by the templates this map uses; actors use the owner colour like the
+# engine's AppearsOnMapPreview does.
+TEMPLATE_COLOURS = {
+    255: (0x28, 0x44, 0x28), 65535: (0x28, 0x44, 0x28),          # Clear
+    1: (0x5C, 0x74, 0xA4), 2: (0x5C, 0x74, 0xA4),                # Water
+    17: (0xB0, 0x9C, 0x78), 25: (0xB0, 0x9C, 0x78), 26: (0xB0, 0x9C, 0x78), 46: (0xB0, 0x9C, 0x78), 55: (0xB0, 0x9C, 0x78),  # Beach
+    66: (0x44, 0x44, 0x3C), 67: (0x44, 0x44, 0x3C), 107: (0x44, 0x44, 0x3C),  # Rock / Rough
+    241: (0x60, 0x60, 0x60), 235: (0x60, 0x60, 0x60), 238: (0x60, 0x60, 0x60), 380: (0x60, 0x60, 0x60), 381: (0x60, 0x60, 0x60),  # Bridge
+    211: (0x5E, 0x43, 0x0D), 207: (0x5E, 0x43, 0x0D), 214: (0x5E, 0x43, 0x0D), 206: (0x5E, 0x43, 0x0D), 218: (0x5E, 0x43, 0x0D),  # Road
+}
+ORE_COLOUR = (0x94, 0x80, 0x60)
+TREE_COLOUR = (0x1C, 0x20, 0x24)
+WALL_COLOUR = (0xD0, 0xC0, 0xA0)
+OWNER_COLOURS = {"Omarchy": (0x9E, 0xCE, 0x6A), "USSR": (0xFE, 0x11, 0x00)}
+
+
+def preview_colours(tiles, res, actors):
+    cells = {}
+    for x in range(W):
+        for y in range(H):
+            t = tiles[x][y][0]
+            c = TEMPLATE_COLOURS.get(t, (0x44, 0x44, 0x3C))
+            if res[x][y][0]:
+                c = ORE_COLOUR
+            cells[(x, y)] = c
+    for cell, who in actors.reserved.items():
+        kind, owner = actors.kinds[who]
+        if kind == "waypoint":
+            continue
+        if kind.startswith("t0"):
+            cells[cell] = TREE_COLOUR
+        elif kind == "brik":
+            cells[cell] = WALL_COLOUR
+        elif owner in OWNER_COLOURS:
+            cells[cell] = OWNER_COLOURS[owner]
+    return cells
+
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     tiles = build_terrain()
@@ -434,6 +483,12 @@ def main():
     res, ore_cells = place_ore(tiles, actors)
     write_bin(os.path.join(OUT_DIR, "map.bin"), tiles, res)
     write_yaml(os.path.join(OUT_DIR, "map.yaml"), actors)
+
+    # Art: the Omarchy logo as a 3x3-cell ground sign (72x72 px) and the locked map preview.
+    sign_px = 24 * FOOTPRINTS["omarchy.sign"][0]
+    build_art.write_shp(os.path.join(OUT_DIR, "omarchysign.shp"), sign_px, sign_px, [build_art.logo_sign_frame(sign_px)])
+    build_art.build_preview(os.path.join(OUT_DIR, "map.png"), preview_colours(tiles, res, actors), BOUNDS, scale=4, logo_px=64)
+
     print(ascii_preview(tiles, res, actors))
     print(f"actors: {len(actors.entries)}, ore cells: {ore_cells}")
 

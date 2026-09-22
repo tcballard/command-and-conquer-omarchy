@@ -6,9 +6,12 @@ engine changes, no bundled art. Text, numbers and a Lua script only.
 
 * `omarchy-edition.oramap` — the deliverable. See `INSTALL.md`.
 * `omarchy-edition/` — the unzipped source (`map.yaml`, `map.bin`,
-  `rules.yaml`, `omarchy.ftl`, `omarchy.lua`).
-* `tools/build_map.py` — deterministic generator for `map.bin` and
-  `map.yaml`; `tools/package.sh` regenerates and zips.
+  `map.png`, `rules.yaml`, `sequences.yaml`, `omarchysign.shp`,
+  `omarchy.ftl`, `omarchy.lua`).
+* `tools/build_map.py` — deterministic generator for `map.bin`, `map.yaml`,
+  `map.png` and the logo sprite; `tools/build_art.py` rasterizes the
+  official Omarchy logo SVG and writes the Westwood `.shp`;
+  `tools/package.sh` regenerates and zips. Requires Python 3 and Pillow.
 * `NOTES.md` — what was verified against the engine source, what was not,
   deviations, confidence.
 

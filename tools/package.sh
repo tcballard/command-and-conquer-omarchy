@@ -6,6 +6,6 @@ cd "$(dirname "$0")/.."
 python3 tools/build_map.py > /dev/null
 rm -f omarchy-edition.oramap
 cd omarchy-edition
-zip -r ../omarchy-edition.oramap map.yaml map.bin rules.yaml *.ftl *.lua
+zip -r ../omarchy-edition.oramap map.yaml map.bin map.png rules.yaml sequences.yaml *.ftl *.lua *.shp
 cd ..
 unzip -l omarchy-edition.oramap

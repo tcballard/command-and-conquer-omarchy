@@ -129,3 +129,20 @@ DOG:
 4TNK:
 	Tooltip:
 		Name: commie-4tnk.name
+
+OMARCHY.SIGN:
+	Inherits@1: ^SpriteActor
+	Interactable:
+	Tooltip:
+		Name: omarchy-sign.name
+		ShowOwnerRow: false
+	RenderSprites:
+		Image: omarchysign
+	WithSpriteBody:
+	Building:
+		Footprint: xxx xxx xxx
+		Dimensions: 3,3
+	AppearsOnRadar:
+	HiddenUnderShroud:
+	MapEditorData:
+		Categories: Decoration
