@@ -55,7 +55,7 @@ jobs:
           ./utility.sh omarchy --check-yaml
       - name: Publish self-contained Linux engine
         working-directory: engine
-        run: dotnet publish -c Release -p:TargetPlatform=linux-x64 -p:CopyGenericLauncher=True -p:CopyCncDll=True -p:CopyD2kDll=False -r linux-x64 -p:PublishDir="$GITHUB_WORKSPACE/build/runtime" --self-contained true
+        run: dotnet publish -c Release -p:TargetPlatform=linux-x64 -p:CopyGenericLauncher=True -p:CopyCncDll=True -p:CopyD2kDll=False -r linux-x64 -p:PublishDir="$GITHUB_WORKSPACE/build/runtime" --self-contained true -m:1
       - name: Stage and verify the bundled Omarchy game
         run: |
           python tools/build_bundle.py engine build/runtime
@@ -63,6 +63,8 @@ jobs:
           export ENGINE_DIR="$PWD" MOD_SEARCH_PATHS="$PWD/mods" TREAT_WARNINGS_AS_ERRORS=true
           ./OpenRA.Utility omarchy --check-omarchy
           ./OpenRA.Utility omarchy --check-yaml
+      - name: Smoke test the real bundled game client
+        run: python tools/smoke_bundle.py build/bundle
       - name: Build single-file installer
         run: |
           python tools/build_installer.py

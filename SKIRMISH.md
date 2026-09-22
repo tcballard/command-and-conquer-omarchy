@@ -7,46 +7,34 @@ skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.2/install-omarchy-edition.sh)** from the preview release,
+Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.3/install-omarchy-edition.sh)** from the preview release,
 then run it as your normal user:
 
 ```sh
 bash ~/Downloads/install-omarchy-edition.sh
 ```
 
-This single file includes the compiled map and all custom artwork. It installs
-OpenRA through pacman if missing, checks for version `20250330`, installs the
-map for your user and adds **Command & Conquer: Omarchy Edition** to the app
-menu. No Git, Python or source checkout is needed. Internet and sudo are only
-needed for installing the OpenRA package; OpenRA may also download its Red
-Alert content on first launch. Complete that content setup when prompted.
-The installer does not bundle the original game files or automatically start
-a match. It opens the dedicated Omarchy lobby directly. There is one playable
-map and no map-change button, campaign browser, multiplayer browser or editor
-entry point. Leaving the lobby shows Skirmish, Settings and Quit. The standard
-OpenRA launcher remains available separately.
+This single file includes the pinned OpenRA engine, .NET runtime, dedicated
+Omarchy mod, map and all custom artwork. No system OpenRA installation,
+Git, Python or sudo is needed. First launch may download Red Alert terrain
+and sounds; existing content is reused where available.
 
-Run the same installer again to update its map. Use `--no-launch` to install
-without opening the game. A different OpenRA release is rejected without
-silently downgrading it. This development installer targets x86_64 Omarchy /
-Arch; its portable lifecycle tests pass, but installation and desktop launch
-on an actual XPS remain untested.
+The only playable map is Package Conflict. The window title says
+**preview 3 (bundled)**. There is no map-change button, campaign browser,
+multiplayer browser or editor entry point. Leaving the lobby shows
+Skirmish, Settings and Quit.
 
-To remove it:
+Re-run the installer to update. It validates every custom faction image
+before activating the new bundle. `--no-launch` installs without opening
+it. `--uninstall` removes the bundled engine and launcher while preserving
+content, settings, saves and any older OpenRA installation.
 
-```sh
-bash ~/Downloads/install-omarchy-edition.sh --uninstall
+To verify and launch the installed bundle directly:
+
+```bash
+bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/launch.sh" --verify
+bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/launch.sh"
 ```
-
-Or run `bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/uninstall.sh"`.
-Removal keeps OpenRA, downloaded content, saves and other maps. If this
-installer replaced an earlier Package Conflict map, that copy is restored.
-If you have edited the installed map, removal stops and preserves it; move
-that file aside before retrying. Both XDG and legacy `~/.openra` paths work. The dedicated mod keeps its own
-settings, saves and replays under the app's `support` directory and shares
-only the existing Red Alert content directory. Uninstall preserves that
-support directory. This is a focused launcher, not a restriction on what
-you can do with a separately launched OpenRA or edited source code.
 
 ### Build from source
 
@@ -58,6 +46,8 @@ git clone --branch release-20250330 --depth 1 https://github.com/OpenRA/OpenRA.g
 (cd engine && dotnet build -c Release -p:TargetPlatform=unix-generic)
 dotnet build mod/OpenRA.Mods.Omarchy -c Release -p:EngineDir="$PWD/engine/bin" -o build/menu
 python tools/build_omarchy_mod.py engine build/menu/OpenRA.Mods.Omarchy.dll
+(cd engine && dotnet publish -c Release -p:TargetPlatform=linux-x64 -p:CopyGenericLauncher=True -p:CopyCncDll=True -p:CopyD2kDll=False -r linux-x64 -p:PublishDir="$PWD/../build/runtime" --self-contained true -m:1)
+python tools/build_bundle.py engine build/runtime
 python tools/build_installer.py
 bash build/install-omarchy-edition.sh
 ```

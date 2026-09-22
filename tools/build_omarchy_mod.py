@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import shutil
+import re
 import zipfile
 import skirmish_roster as roster
 
@@ -56,6 +57,19 @@ def build(engine, dll, output):
         for name in src.namelist():
             if name not in ('map.yaml', 'map.bin', 'map.png'):
                 (art / name).write_bytes(src.read(name))
+    # Map-local Fluent permits unused attributes; mod-global Fluent does not.
+    # Shared production descriptions deliberately use stock role text.
+    used = set(re.findall(r'(?:omarchy|garden)-[\w-]+\.(?:name|description)', (art / 'rules.yaml').read_text()))
+    messages = []
+    for block in (art / 'omarchy.ftl').read_text().split('\n\n'):
+        lines = block.splitlines()
+        if not lines or ' = ' in lines[0] or not lines[0].endswith(' ='):
+            continue
+        key = lines[0][:-2].strip()
+        attributes = [line for line in lines[1:] if key + '.' + line.strip().split(' =')[0].lstrip('.') in used]
+        if attributes:
+            messages.append('\n'.join([lines[0], *attributes]))
+    (art / 'omarchy.ftl').write_text('\n\n'.join(messages) + '\n')
     (mod / 'roster-check.tsv').write_text(''.join(
         f'{actor}\t{faction}\t{side}-{actor}\n'
         for side, faction in [('omarchy', 'allies'), ('garden', 'soviet')]
