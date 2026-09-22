@@ -7,8 +7,7 @@ skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Download **install-omarchy-edition.sh** from the build artifact attached to the
-[skirmish workflow](https://github.com/tcballard/command-and-conquer-omarchy/actions/workflows/skirmish.yml),
+Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.1/install-omarchy-edition.sh)** from the preview release,
 then run it as your normal user:
 
 ```sh

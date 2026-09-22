@@ -9,8 +9,16 @@ Telemetry, and a particularly aggressive Antivirus.
 **Package Conflict** gives both sides room to build, equal ore fields and
 normal skirmish AI. No scripted waves or campaign countdown.
 
-**[Install and play →](SKIRMISH.md)** — one installer includes the custom
-artwork and map, installs OpenRA if needed, and adds an app-menu launcher.
+**[Download the preview installer →](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.1/install-omarchy-edition.sh)**
+
+One file includes the custom artwork and map, installs OpenRA if needed, and
+adds an app-menu launcher. On your x86_64 Omarchy PC, run:
+
+```bash
+bash ~/Downloads/install-omarchy-edition.sh
+```
+
+[Setup, first launch and uninstall →](SKIRMISH.md) · [Preview release notes →](https://github.com/tcballard/command-and-conquer-omarchy/releases/tag/v0.0.1-preview.1)
 
 ## A custom army on both sides
 

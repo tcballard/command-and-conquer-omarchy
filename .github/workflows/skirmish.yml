@@ -70,3 +70,37 @@ jobs:
             build/omarchy-skirmish/icon-preview.png
             build/omarchy-skirmish/map.png
             build/omarchy-skirmish/art-manifest.json
+  publish-preview:
+    # Publish this immutable preview once, only after the complete validation job.
+    # Later pushes leave the existing release and its assets untouched.
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/codex/omarchy-skirmish'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: omarchy-skirmish
+          path: preview
+      - name: Publish first installer preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=v0.0.1-preview.1
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Preview already exists; leaving its assets untouched."
+            exit 0
+          fi
+          cd preview
+          sha256sum --check install-omarchy-edition.sh.sha256
+          cd ..
+          gh release create "$tag" \
+            preview/install-omarchy-edition.sh \
+            preview/install-omarchy-edition.sh.sha256 \
+            preview/omarchy-skirmish.oramap \
+            --target "$GITHUB_SHA" --prerelease \
+            --title 'Omarchy Edition — first skirmish preview' \
+            --notes-file packaging/PREVIEW-NOTES.md
