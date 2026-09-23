@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import shutil
 import re
+import struct
 import zipfile
 import skirmish_roster as roster
 
@@ -48,6 +49,10 @@ def build(engine, dll, output):
     shutil.copyfile(dll, mod / dll.name)
     for path in (ROOT / 'mod/ui').iterdir():
         shutil.copyfile(path, mod / path.name)
+    # OpenRA's texture backend requires power-of-two sheet dimensions.
+    cover = (mod / 'cover.png').read_bytes()
+    if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
+        raise RuntimeError('Loading screen must be a 2048x1024 PNG sheet')
     # Reuse the stock content downloader, but return to Omarchy when it finishes.
     content_manifest = (engine / 'mods/ra-content/mod.yaml').read_text()
     content_manifest = content_manifest.replace('{DEV_VERSION}', 'release-20250330').replace('\tMod: ra\n', '\tMod: omarchy\n')

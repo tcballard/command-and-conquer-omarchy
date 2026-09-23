@@ -16,7 +16,7 @@ namespace OpenRA.Mods.Omarchy
             if (sheet != previousSheet)
             {
                 previousSheet = sheet;
-                cover = sheet == null ? null : CreateSprite(sheet, density, new Rectangle(0, 0, 1440, 810));
+                cover = sheet == null ? null : CreateSprite(sheet, density, new Rectangle(304, 107, 1440, 810));
             }
 
             if (cover == null)
