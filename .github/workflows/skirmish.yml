@@ -119,7 +119,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag=v0.0.1-preview.4
+          tag=v0.0.1-preview.5
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Preview already exists; leaving its assets untouched."
             exit 0

@@ -1,6 +1,6 @@
-# Bundled Omarchy Edition — preview 4
+# Bundled Omarchy Edition — preview 5
 
-The approved Command & Conquer poster is now the game's loading screen and is embedded in the bundled installer. It keeps its full composition at different screen sizes.
+The loading screen now shows the approved poster with the subtitle plaque removed, Omarchy lettering and “EDITION” beneath the Command & Conquer title. It is embedded in the bundled installer and keeps its full composition at different screen sizes.
 
 This release includes its own pinned OpenRA engine, .NET runtime, dedicated Omarchy mod and complete 91-entry custom faction roster. It does not install or launch the system OpenRA package. Only Package Conflict is playable.
 
@@ -15,7 +15,7 @@ sha256sum --check install-omarchy-edition.sh.sha256
 bash install-omarchy-edition.sh
 ```
 
-Run without sudo. The app launcher is **Command & Conquer: Omarchy Edition**. The window title says **preview 4 (bundled)**. First launch may download the Red Alert terrain and sounds via the content installer; these are not embedded in the bundle. Existing content is reused where available.
+Run without sudo. The app launcher is **Command & Conquer: Omarchy Edition**. The window title says **preview 5 (bundled)**. First launch may download the Red Alert terrain and sounds via the content installer; these are not embedded in the bundle. Existing content is reused where available.
 
 To verify or launch the precise installed bundle:
 
