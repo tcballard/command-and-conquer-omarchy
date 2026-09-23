@@ -1,7 +1,7 @@
 # Omarchy Skirmish
 
-**Package Conflict** is a two-player land skirmish for OpenRA Red Alert
-`release-20250330`: Omarchians versus **The Walled Garden**.
+**Package Conflict** is a three-player land skirmish for OpenRA Red Alert
+`release-20250330`: Omarchians versus **Reboot Required** and **The Walled Orchard**.
 Build a base, harvest, train DHH and launch the coding agents. Normal
 skirmish victory rules apply. There are no missions, waves or deadlines.
 
@@ -59,7 +59,8 @@ remains available: `sh tools/install_skirmish.sh [--dest MAP_DIRECTORY]`.
 
 Launch **Command & Conquer: Omarchy Edition** from your app menu.
 **Package Conflict** opens directly in the skirmish lobby. Take the green Omarchian slot and
-put **Normal AI** in the pink Walled Garden slot. Both slots must be occupied.
+put **Normal AI** in the pink Reboot Required and purple Walled Orchard slots.
+All three slots must be occupied.
 Default cash is $10,000 with Light Support starting units. Rush and Turtle
 AI also work with the map rules; avoid Naval AI on this land map. Two humans
 can play too. Factions, colours and starting positions are fixed.
@@ -79,12 +80,12 @@ Steam and Yuri's Revenge are not required.
 - Illustrated faction-specific production icons, a self-contained custom
   palette and player-colour accents.
 
-The two factions keep stock actor IDs so AI, factories, captured structures,
+The three factions keep stock actor IDs so AI, factories, captured structures,
 harvesters and MCV deployment remain compatible. Six country-exclusive units
-are unlocked for the map's two fixed factions; their tech requirements remain.
+are unlocked for the map's fixed factions; their tech requirements remain.
 DHH retains Tanya's normal tech requirements, cost and one-unit limit.
 Most combat values remain stock; the existing light/heavy tank speed changes
-remain. The symmetric map has six regenerating ore mines and a central village.
+remain. The map has eight regenerating ore mines and a central village.
 
 ## Current limits
 

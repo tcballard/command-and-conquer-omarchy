@@ -20,9 +20,9 @@ GARDEN = [
     ('kenn','Endpoint Security','Identifies threats. Occasionally correctly.','kennel'),
     ('iron','Vendor Lock-in','Temporarily prevents all forms of migration.','forcefield'),
     ('ftur','Thermal Throttling','Runs hot. Very hot.','flame tower'),
-    ('sam','Gatekeeper','This aircraft is from an unidentified developer.','AA missile'),
+    ('sam','Signed Entry','This aircraft is from an unidentified developer.','AA missile'),
     ('tsla','DRM','Unauthorised access will be electrically discouraged.','coil'),
-    ('afld','App Store','Every take-off requires platform approval.','airfield'),
+    ('afld','Approved Apps','Every take-off requires platform approval.','airfield'),
     ('mslo','Forced Reboot','Your work was probably saved.','superweapon'),
     ('brik','Paywall','Subscribe to pass.','wall'),
     ('fenc','Terms of Service','By approaching this fence you agree to its terms.','fence'),
@@ -48,15 +48,15 @@ GARDEN = [
     ('harv','Data Harvester','Harvests resources and probably your browsing history.','harvester'),
     ('truk','Cloud Sync','Moves credits. Requires an account.','supply truck'),
     ('mig','Forced Update','Arrives uninvited. Reboots what it hits.','strike jet'),
-    ('yak','Clippy','It looks like you are trying to defend a base.','attack plane'),
+    ('yak','Helpful Assistant','It looks like you are trying to defend a base.','attack plane'),
     ('hind','Notification Spam','Turn them off. Another appears.','helicopter'),
     ('badr','Bundle Installer','Drops several things you did not ask for.','cargo plane'),
     ('u2','Diagnostics','Collecting information about this incident.','scout plane'),
 ]
 SIDES = {'omarchy': OMARCHY, 'garden': GARDEN}
-FACTIONS = {'allies':'Omarchy', 'soviet':'The Walled Garden'}
+FACTIONS = {'allies':'Omarchy', 'soviet':'Reboot Required', 'russia':'The Walled Orchard'}
 SUPPORT = {'badr','u2'}
-# Keep country-special units usable with this map's two fixed factions.
+# Keep country-special units usable with this map's fixed factions.
 PREREQUISITES = {
     'mgg':'atek, ~vehicles.allies, ~techlevel.high',
     'ctnk':'atek, ~vehicles.allies, ~techlevel.high',

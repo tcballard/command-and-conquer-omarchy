@@ -11,7 +11,7 @@ omarchy-radar:
 	Regions:
 		radar: 17, 17, 222, 222
 
-# Match OpenRA's 30x15 faction slots; every entry uses the official Omarchy mark.
+# 32-pixel atlas cells contain 30x15 lobby flags.
 flags:
 	Inherits: ^OmarchyBrand
 	Image: omarchy-faction.png
@@ -22,11 +22,11 @@ flags:
 		spain: 0, 0, 30, 15
 		turkey: 0, 0, 30, 15
 		greece: 0, 0, 30, 15
-		ukraine: 0, 0, 30, 15
-		russia: 0, 0, 30, 15
+		ukraine: 96, 0, 30, 15
+		russia: 64, 0, 30, 15
 		allies: 0, 0, 30, 15
-		soviet: 0, 0, 30, 15
-		RandomSoviet: 0, 0, 30, 15
+		soviet: 32, 0, 30, 15
+		RandomSoviet: 96, 0, 30, 15
 		RandomAllies: 0, 0, 30, 15
 		Random: 0, 0, 30, 15
 		spectator: 0, 0, 30, 15

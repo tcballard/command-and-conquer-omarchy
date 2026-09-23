@@ -53,7 +53,7 @@ def build(engine, dll, output):
     shutil.copyfile(dll, mod / dll.name)
     for path in (ROOT / 'mod/ui').iterdir():
         shutil.copyfile(path, mod / path.name)
-    # Keep lobby widget identities/logic while giving the two-faction match room.
+    # Keep lobby widget identities/logic while giving the three-faction match room.
     for filename in ('lobby.yaml', 'lobby-players.yaml'):
         manifest = (mod / 'mod.yaml.in').read_text()
         manifest = manifest.replace(f'common|chrome/{filename}', f'omarchy|{filename}')
@@ -99,7 +99,7 @@ def build(engine, dll, output):
     cover = (mod / 'cover.png').read_bytes()
     if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
         raise RuntimeError('Loading screen must be a 2048x1024 PNG sheet')
-    for filename, size in (('omarchy-icon.png', (256, 256)), ('omarchy-faction.png', (32, 16)), ('omarchy-panels.png', (256, 64)), ('omarchy-hud.png', (1024, 512)), ('installer.png', (1024, 512))):
+    for filename, size in (('omarchy-icon.png', (256, 256)), ('omarchy-faction.png', (128, 16)), ('omarchy-panels.png', (256, 64)), ('omarchy-hud.png', (1024, 512)), ('installer.png', (1024, 512))):
         pixels = (mod / filename).read_bytes()
         if not pixels.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', pixels, 16) != size:
             raise RuntimeError(f'{filename} must be a {size[0]}x{size[1]} PNG sheet')
@@ -147,7 +147,7 @@ def build(engine, dll, output):
     (art / 'omarchy.ftl').write_text('\n\n'.join(messages) + '\n')
     (mod / 'roster-check.tsv').write_text(''.join(
         f'{actor}\t{faction}\t{side}-{actor}\n'
-        for side, faction in [('omarchy', 'allies'), ('garden', 'soviet')]
+        for side, faction in [('omarchy', 'allies'), ('garden', 'soviet'), ('garden', 'russia')]
         for actor, *_ in roster.SIDES[side]))
     maps = mod / 'maps'
     maps.mkdir(exist_ok=True)

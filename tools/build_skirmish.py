@@ -12,8 +12,8 @@ import build_roster_art as build_skirmish_art
 ROOT = Path(__file__).resolve().parent.parent
 SIZE = 96
 BOUNDS = (2, 2, 92, 92)
-SPAWNS = ((18, 73), (77, 22))
-ORE_CENTRES = ((30, 74), (18, 57), (38, 48))
+SPAWNS = ((18, 73), (77, 22), (77, 73))
+ORE_CENTRES = ((30, 74), (18, 57), (38, 48), (65, 73))
 
 
 def scenery():
@@ -87,7 +87,8 @@ World:
 	Faction@germany:
 		Selectable: False
 	Faction@russia:
-		Selectable: False
+		Name: omarchy-skirmish-faction-russia.name
+		Selectable: True
 	Faction@ukraine:
 		Selectable: False
 	Faction@random:
@@ -212,6 +213,18 @@ Players:
 		Spawn: 2
 		LockTeam: True
 		Team: 0
+	PlayerReference@Multi2:
+		Name: Multi2
+		Playable: True
+		Required: True
+		LockFaction: True
+		Faction: russia
+		LockColor: True
+		Color: BB9AF7
+		LockSpawn: True
+		Spawn: 3
+		LockTeam: True
+		Team: 0
 
 Actors:
 """]
@@ -263,7 +276,7 @@ def generate(output):
         for dx in range(2):
             for dy in range(2):
                 cells[x + dx, y + dy] = (190, 181, 158)
-    for (x, y), colour in zip(SPAWNS, ((158, 206, 106), (247, 118, 142))):
+    for (x, y), colour in zip(SPAWNS, ((158, 206, 106), (247, 118, 142), (187, 154, 247))):
         for dx in range(-2, 3):
             for dy in range(-2, 3):
                 cells[x + dx, y + dy] = colour

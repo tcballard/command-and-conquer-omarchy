@@ -7,10 +7,11 @@
 Build the ISO. Harvest packages. Send DHH and the coding agents into battle.
 
 An Omarchy-themed **OpenRA Red Alert skirmish**, built for fun. The green
-Omarchians face **The Walled Garden**: Bloatware tanks, Forced Update jets,
-Telemetry, and a particularly aggressive Antivirus.
+Omarchians face **Reboot Required** and **The Walled Orchard**: two rival
+closed platforms fielding Bloatware tanks, Forced Update jets, Telemetry,
+and a particularly aggressive Antivirus.
 
-**Package Conflict** gives both sides room to build, equal ore fields and
+**Package Conflict** gives all three sides room to build, nearby ore fields and
 normal skirmish AI. No scripted waves or campaign countdown.
 
 **[Download the preview installer →](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.7/install-omarchy-edition.sh)**

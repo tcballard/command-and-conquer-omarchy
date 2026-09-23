@@ -51,7 +51,8 @@ class SkirmishTests(unittest.TestCase):
                 if 2 <= cell[0] < 94 and 2 <= cell[1] < 94 and cell not in blocked and cell not in seen:
                     seen.add(cell)
                     queue.append(cell)
-        self.assertIn(sk.SPAWNS[1], seen)
+        for spawn in sk.SPAWNS[1:]:
+            self.assertIn(spawn, seen)
         self.assertTrue(set(resources) <= seen)
 
     def test_binary_and_rules_are_skirmish_only(self):
@@ -72,13 +73,15 @@ class SkirmishTests(unittest.TestCase):
             manifest = (out / "map.yaml").read_text()
             self.assertIn('Faction@allies:\n\t\tName: omarchy-skirmish-faction-allies.name\n\t\tSelectable: True', rules)
             self.assertIn('Faction@soviet:\n\t\tName: omarchy-skirmish-faction-soviet.name\n\t\tSelectable: True', rules)
+            self.assertIn('Faction@russia:\n\t\tName: omarchy-skirmish-faction-russia.name\n\t\tSelectable: True', rules)
             self.assertIn('PlayerReference@Multi0:\n\t\tName: Multi0\n\t\tPlayable: True\n\t\tRequired: True\n\t\tLockFaction: True\n\t\tFaction: allies', manifest)
             for forbidden in ("LuaScript", "MissionData", "CampaignAI", "~disabled", ".COMMIE:"):
                 self.assertNotIn(forbidden, rules)
             self.assertNotIn("campaign", manifest)
-            self.assertEqual(manifest.count(": mpspawn"), 2)
-            self.assertEqual(manifest.count("Playable: True"), 2)
-            # Only the six country-exclusive units are unlocked for our fixed two factions.
+            self.assertIn('PlayerReference@Multi2:\n\t\tName: Multi2\n\t\tPlayable: True\n\t\tRequired: True\n\t\tLockFaction: True\n\t\tFaction: russia', manifest)
+            self.assertEqual(manifest.count(": mpspawn"), 3)
+            self.assertEqual(manifest.count("Playable: True"), 3)
+            # Country-exclusive units are unlocked for the fixed factions.
             self.assertEqual(rules.count("\t\tPrerequisites:"), len(sk.roster.PREREQUISITES))
             for actor, prerequisite in sk.roster.PREREQUISITES.items():
                 self.assertIn(f"Prerequisites: {prerequisite}", rules)
