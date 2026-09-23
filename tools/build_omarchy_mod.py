@@ -24,7 +24,7 @@ def build(engine, dll, output):
     manifest = manifest.replace('WindowTitle: mod-windowtitle', 'WindowTitle: omarchy-window-title')
     manifest = manifest.replace('\t\t$ra: ra', '\t\t$ra: ra\n\t\t$omarchy: omarchy')
     manifest = manifest.replace('ContentInstallerMod: ra-content', 'ContentInstallerMod: omarchy-content')
-    manifest = manifest.replace('\tra|chrome.yaml', '\tra|chrome.yaml\n\tomarchy|chrome.yaml')
+    manifest = manifest.replace('\tra|chrome.yaml', '\tra|chrome.yaml\n\tomarchy|chrome.yaml\n\tomarchy|panels.yaml')
     manifest = manifest.replace('\tra|chrome/ingame-player.yaml', '\tomarchy|ingame-player.yaml')
     manifest = manifest.replace('\tra|chrome/gamesave-loading.yaml', '\tomarchy|gamesave-loading.yaml')
     manifest = manifest.replace('\tcommon|chrome/ingame-menu.yaml', '\tomarchy|ingame-menu.yaml')
@@ -53,6 +53,35 @@ def build(engine, dll, output):
     shutil.copyfile(dll, mod / dll.name)
     for path in (ROOT / 'mod/ui').iterdir():
         shutil.copyfile(path, mod / path.name)
+    # Keep lobby widget identities/logic while giving the two-faction match room.
+    for filename in ('lobby.yaml', 'lobby-players.yaml'):
+        manifest = (mod / 'mod.yaml.in').read_text()
+        manifest = manifest.replace(f'common|chrome/{filename}', f'omarchy|{filename}')
+        (mod / 'mod.yaml.in').write_text(manifest)
+        (mod / 'mod.yaml').write_text(manifest.replace('@OMARCHY_DLL@', str((mod / dll.name).resolve())))
+    lobby = (engine / 'mods/common/chrome/lobby.yaml').read_text()
+    lobby = lobby.replace('Width: 900', 'Width: 1040').replace('Height: 600', 'Height: 560')
+    lobby = lobby.replace('Width: 675', 'Width: 755').replace('X: 695 - WIDTH', 'X: 775 - WIDTH')
+    lobby = lobby.replace('Y: 67', 'Y: 90').replace('Height: 219', 'Height: 175')
+    lobby = lobby.replace('Y: 285', 'Y: 270').replace('Y: 291', 'Y: 276')
+    lobby = lobby.replace('Height: 259', 'Height: 210')
+    lobby = lobby.replace('Button@START_GAME_BUTTON:', 'Button@START_GAME_BUTTON:\n\t\t\tBackground: omarchy-primary')
+    lobby = lobby.replace('Label@SERVER_NAME:', 'Label@SERVER_NAME:\n\t\t\tVisible: False')
+    lobby = lobby.replace('\tChildren:\n', '\tChildren:\n'
+        '\t\tLabel@OMARCHY_TITLE:\n\t\t\tX: 24\n\t\t\tY: 16\n'
+        '\t\t\tWidth: 700\n\t\t\tHeight: 30\n\t\t\tFont: BigBold\n'
+        '\t\t\tTextColor: 9ECE6A\n\t\t\tText: omarchy-lobby-title\n'
+        '\t\tLabel@OMARCHY_SUBTITLE:\n\t\t\tX: 24\n\t\t\tY: 46\n'
+        '\t\t\tWidth: 700\n\t\t\tHeight: 20\n\t\t\tTextColor: A9B1A7\n'
+        '\t\t\tText: omarchy-lobby-subtitle\n', 1)
+    (mod / 'lobby.yaml').write_text(lobby)
+    players = (engine / 'mods/common/chrome/lobby-players.yaml').read_text()
+    players = re.sub(r'X: (410|420|478|560|617|619)\b', lambda m: f'X: {int(m[1]) + 70}', players)
+    players = players.replace('Width: 140', 'Width: 210')
+    players = players.replace('Container@FACTION:\n\t\t\t\t\t\t\tX: 270\n\t\t\t\t\t\t\tWidth: 160',
+                              'Container@FACTION:\n\t\t\t\t\t\t\tX: 270\n\t\t\t\t\t\t\tWidth: 230')
+    players = re.sub(r'(Label@FACTIONNAME:[\s\S]*?Width:) 70', r'\1 160', players)
+    (mod / 'lobby-players.yaml').write_text(players)
     # Keep the pinned upstream widget layouts, changing only branded artwork references.
     player = (engine / 'mods/ra/chrome/ingame-player.yaml').read_text()
     player = player.replace('Logic: AddFactionSuffixLogic, IngameRadarDisplayLogic', 'Logic: IngameRadarDisplayLogic')
@@ -70,7 +99,7 @@ def build(engine, dll, output):
     cover = (mod / 'cover.png').read_bytes()
     if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
         raise RuntimeError('Loading screen must be a 2048x1024 PNG sheet')
-    for filename, size in (('omarchy-icon.png', (256, 256)), ('omarchy-faction.png', (32, 16)), ('installer.png', (1024, 512))):
+    for filename, size in (('omarchy-icon.png', (256, 256)), ('omarchy-faction.png', (32, 16)), ('omarchy-panels.png', (256, 64)), ('installer.png', (1024, 512))):
         pixels = (mod / filename).read_bytes()
         if not pixels.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', pixels, 16) != size:
             raise RuntimeError(f'{filename} must be a {size[0]}x{size[1]} PNG sheet')
