@@ -70,6 +70,9 @@ class SkirmishTests(unittest.TestCase):
                     self.assertEqual(tuple(data[offset:offset + 2]), expected.get((x, y), (0, 0)))
             rules = (out / "rules.yaml").read_text()
             manifest = (out / "map.yaml").read_text()
+            self.assertIn('Faction@allies:\n\t\tName: omarchy-skirmish-faction-allies.name\n\t\tSelectable: True', rules)
+            self.assertIn('Faction@soviet:\n\t\tName: omarchy-skirmish-faction-soviet.name\n\t\tSelectable: True', rules)
+            self.assertIn('PlayerReference@Multi0:\n\t\tName: Multi0\n\t\tPlayable: True\n\t\tRequired: True\n\t\tLockFaction: True\n\t\tFaction: allies', manifest)
             for forbidden in ("LuaScript", "MissionData", "CampaignAI", "~disabled", ".COMMIE:"):
                 self.assertNotIn(forbidden, rules)
             self.assertNotIn("campaign", manifest)

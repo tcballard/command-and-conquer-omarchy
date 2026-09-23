@@ -65,6 +65,12 @@ if [[ ${1:-} == --verify ]]; then
   sha256sum --check --status SHA256SUMS
   exec ./OpenRA.Utility omarchy --check-omarchy
 fi
+# OpenRA restores the last skirmish faction even when the map fixes player slots.
+# Migrate an existing lobby choice so the human always starts as Omarchy.
+skirmish="$app_dir/support/skirmish.omarchy.yaml"
+if [[ -f $skirmish ]]; then
+  sed -i '/^Player: Multi0$/,/^Bots:/ s/^[[:space:]]*Faction: [^[:space:]]\+$/\tFaction: allies/' "$skirmish"
+fi
 printf 'Starting Omarchy Edition %s (bundled engine)\n' "$(cat OMARCHY_VERSION)"
 exec ./OpenRA Game.Mod=omarchy "Engine.ModSearchPaths=$engine_dir/mods" \
   "Engine.LaunchPath=$app_dir/launch.sh" "Engine.SupportDir=$app_dir/support" \
@@ -82,7 +88,7 @@ Type=Application
 Name=Command & Conquer: Omarchy Edition
 Comment=Bundled Omarchy skirmish — custom units vs The Walled Garden
 Exec="$desktop_path/launch.sh"
-Icon=$app_dir/current/mods/ra/icon.png
+Icon=$app_dir/current/mods/omarchy/omarchy-icon.png
 Terminal=false
 Categories=Game;StrategyGame;
 Keywords=Omarchy;Package Conflict;

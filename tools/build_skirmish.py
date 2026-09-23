@@ -76,8 +76,26 @@ def rules():
 World:
 	Faction@allies:
 		Name: omarchy-skirmish-faction-allies.name
+		Selectable: True
 	Faction@soviet:
 		Name: omarchy-skirmish-faction-soviet.name
+		Selectable: True
+	Faction@england:
+		Selectable: False
+	Faction@france:
+		Selectable: False
+	Faction@germany:
+		Selectable: False
+	Faction@russia:
+		Selectable: False
+	Faction@ukraine:
+		Selectable: False
+	Faction@random:
+		Selectable: False
+	Faction@randomallies:
+		Selectable: False
+	Faction@randomsoviet:
+		Selectable: False
 	SpawnStartingUnits:
 		StartingUnitsClass: light
 	PaletteFromFile@OMARCHY:

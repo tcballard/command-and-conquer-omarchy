@@ -63,6 +63,7 @@ class InstallerTests(unittest.TestCase):
         self.assertIn('Game.Mod=omarchy\n', args)
         self.assertNotIn('/usr/lib/openra', args)
         self.assertIn('Engine.SupportDir=' + str(self.app / 'support'), args)
+        self.assertIn('mods/omarchy/omarchy-icon.png', self.desktop.read_text())
         self.assertTrue(os.access(self.app / 'current/OpenRA', os.X_OK))
         previous = (self.app / 'current').resolve()
         self.run_installer('--no-launch')
@@ -84,6 +85,14 @@ class InstallerTests(unittest.TestCase):
         self.env['FAIL_CHECK'] = '1'
         self.run_installer('--no-launch', ok=False)
         self.assertEqual((self.app / 'current').resolve(), old)
+
+    def test_existing_random_player_is_restored_to_omarchy(self):
+        self.run_installer('--no-launch')
+        skirmish = self.app / 'support/skirmish.omarchy.yaml'
+        skirmish.write_text('Player: Multi0\n\tFaction: Random\nBots:\n\trush: Multi1\n\t\tFaction: soviet\n')
+        subprocess.run(['bash', str(self.app / 'launch.sh')], env=self.env, check=True, capture_output=True)
+        self.assertEqual(skirmish.read_text(),
+                         'Player: Multi0\n\tFaction: allies\nBots:\n\trush: Multi1\n\t\tFaction: soviet\n')
 
     def test_missing_runtime_or_corrupt_installed_payload_is_rejected(self):
         (self.bundle / 'libhostfxr.so').unlink()
