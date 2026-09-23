@@ -372,8 +372,11 @@ def icon_images():
         accent=util.GREEN if side=='omarchy' else util.RED
         for actor,name,_,_ in entries:
             if actor in roster.SUPPORT: continue
-            icon=Image.new('RGBA',(64,48),(26,27,38,255));d=ImageDraw.Draw(icon)
+            icon=Image.new('RGBA',(64,48),(43,55,47,255));d=ImageDraw.Draw(icon)
             portrait=fit(source(side,actor,4 if kind(side,actor)=='infantry' else 0),(48,28))
+            # Sidebar art is displayed at 64x48 over a dark HUD. Lift the
+            # portrait here without changing the corresponding world sprite.
+            portrait=ImageEnhance.Brightness(portrait).enhance(1.45)
             icon.alpha_composite(portrait,((64-portrait.width)//2,1))
             words=name.split();lines=['']
             for word in words:

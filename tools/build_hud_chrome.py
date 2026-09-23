@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'mod/ui'
 INK = '#151b1a'
-PANEL = '#1b2420'
-RAISED = '#29362b'
+PANEL = '#202a23'
+RAISED = '#344334'
 BORDER = '#617b53'
 LIME = '#9ece6a'
 MUTED = '#3c4d3d'
@@ -31,13 +31,22 @@ def build():
     plate(0, 296, 190, 47, fill=INK, border=MUTED)
     for x in (3, 65, 127):
         draw.rectangle((x, 299, x + 59, 339), outline=MUTED)
-    plate(0, 348, 238, 47, fill=INK)
+    # This region is painted *over* the production sprites by OpenRA.
+    # Keep the cell interiors transparent or the buildings disappear.
+    draw.line((41, 348, 237, 348), fill=MUTED)
+    draw.line((41, 394, 237, 394), fill=MUTED)
+    draw.line((41, 349, 41, 393), fill=MUTED)
     plate(0, 400, 238, 8, fill=INK, border=MUTED)
     plate(240, 148, 64, 48, fill=INK, border=MUTED)
     plate(256, 0, 434, 44, fill=INK)
     draw.rectangle((260, 3, 685, 5), fill=MUTED)
     draw.rectangle((260, 40, 685, 41), fill=MUTED)
     draw.rectangle((260, 3, 286, 5), fill=LIME)
+
+    # The pause menu's border extends 15 px outside the viewport. Put the
+    # visible strokes just inside that crop, instead of inheriting RA red.
+    draw.rectangle((720, 16, 767, 63), outline=BORDER, width=2)
+    draw.line((722, 17, 741, 17), fill=LIME, width=2)
 
     states = {
         'normal': (256, 64, RAISED, BORDER),
@@ -65,6 +74,9 @@ def build():
         lines += [f'\t\t{name}: {", ".join(map(str, region))}' for name, region in regions.items()]
         lines += ['']
     lines += ['commandbar:', '\tInherits: ^OmarchyHud', '\tRegions:', '\t\tbackground: 256, 0, 434, 44', '']
+    lines += ['mainmenu-border:', '\tInherits: ^OmarchyHud',
+              '\tPanelRegion: 704, 0, 18, 18, 44, 44, 18, 18',
+              '\tPanelSides: Edges', '']
     for faction in ('allies', 'soviet'):
         for kind in ('sidebar-button', 'command-button'):
             for state, (x, y, _, _) in states.items():
