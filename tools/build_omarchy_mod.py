@@ -70,7 +70,7 @@ def build(engine, dll, output):
     cover = (mod / 'cover.png').read_bytes()
     if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
         raise RuntimeError('Loading screen must be a 2048x1024 PNG sheet')
-    for filename, size in (('omarchy-icon.png', (256, 256)), ('installer.png', (1024, 512))):
+    for filename, size in (('omarchy-icon.png', (256, 256)), ('omarchy-faction.png', (32, 16)), ('installer.png', (1024, 512))):
         pixels = (mod / filename).read_bytes()
         if not pixels.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', pixels, 16) != size:
             raise RuntimeError(f'{filename} must be a {size[0]}x{size[1]} PNG sheet')
