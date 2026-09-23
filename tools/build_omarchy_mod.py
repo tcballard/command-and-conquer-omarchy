@@ -23,6 +23,10 @@ def build(engine, dll, output):
     manifest = manifest.replace('WindowTitle: mod-windowtitle', 'WindowTitle: omarchy-window-title')
     manifest = manifest.replace('\t\t$ra: ra', '\t\t$ra: ra\n\t\t$omarchy: omarchy')
     manifest = manifest.replace('ContentInstallerMod: ra-content', 'ContentInstallerMod: omarchy-content')
+    if 'LoadScreen: LogoStripeLoadScreen\n\tImage: ra|uibits/loadscreen.png\n\tImage2x: ra|uibits/loadscreen-2x.png\n\tImage3x: ra|uibits/loadscreen-3x.png' not in manifest:
+        raise RuntimeError('Pinned OpenRA loading screen declaration changed')
+    manifest = manifest.replace('LoadScreen: LogoStripeLoadScreen\n\tImage: ra|uibits/loadscreen.png\n\tImage2x: ra|uibits/loadscreen-2x.png\n\tImage3x: ra|uibits/loadscreen-3x.png',
+                                'LoadScreen: OmarchyCoverLoadScreen\n\tImage: omarchy|cover.png')
     begin = manifest.index('MapFolders:')
     end = manifest.index('\nRules:', begin)
     manifest = manifest[:begin] + 'MapFolders:\n\tomarchy|maps: System\n' + manifest[end:]
