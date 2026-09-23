@@ -54,7 +54,7 @@ GARDEN = [
     ('u2','Diagnostics','Collecting information about this incident.','scout plane'),
 ]
 SIDES = {'omarchy': OMARCHY, 'garden': GARDEN}
-FACTIONS = {'allies':'Omarchians', 'soviet':'The Walled Garden'}
+FACTIONS = {'allies':'Omarchy', 'soviet':'The Walled Garden'}
 SUPPORT = {'badr','u2'}
 # Keep country-special units usable with this map's two fixed factions.
 PREREQUISITES = {
