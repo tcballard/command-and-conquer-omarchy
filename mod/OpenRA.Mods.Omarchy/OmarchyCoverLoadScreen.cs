@@ -16,16 +16,16 @@ namespace OpenRA.Mods.Omarchy
             if (sheet != previousSheet)
             {
                 previousSheet = sheet;
-                cover = sheet == null ? null : CreateSprite(sheet, density, new Rectangle(0, 0, 1672, 941));
+                cover = sheet == null ? null : CreateSprite(sheet, density, new Rectangle(0, 0, 1440, 810));
             }
 
             if (cover == null)
                 return;
 
             var resolution = renderer.Resolution;
-            var scale = System.Math.Min(resolution.Width / 1672f, resolution.Height / 941f);
-            var width = 1672f * scale;
-            var height = 941f * scale;
+            var scale = System.Math.Min(resolution.Width / 1440f, resolution.Height / 810f);
+            var width = 1440f * scale;
+            var height = 810f * scale;
             renderer.RgbaSpriteRenderer.DrawSprite(cover,
                 new float3((resolution.Width - width) / 2, (resolution.Height - height) / 2, 0),
                 new float3(scale, scale, 1));
