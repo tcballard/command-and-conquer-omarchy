@@ -32,7 +32,7 @@ class InstallerTests(unittest.TestCase):
         (self.bundle / 'mods/omarchy').mkdir(parents=True)
         (self.bundle / 'mods/omarchy/mod.yaml').write_text('Assemblies: OpenRA.Mods.Omarchy.dll\n')
         (self.bundle / 'libhostfxr.so').write_bytes(b'test runtime')
-        (self.bundle / 'OMARCHY_VERSION').write_text('v0.0.1-preview.5\n')
+        (self.bundle / 'OMARCHY_VERSION').write_text('v0.0.1-preview.6\n')
         self.script(self.bundle / 'OpenRA', 'printf "%s\\n" "$@" > "$CALLS.args"')
         self.script(self.bundle / 'OpenRA.Utility', 'test "${FAIL_CHECK:-0}" = 0; printf "%s\\n" "$*" >> "$CALLS"')
         self.write_manifest()

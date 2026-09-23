@@ -24,6 +24,10 @@ def build(engine, dll, output):
     manifest = manifest.replace('WindowTitle: mod-windowtitle', 'WindowTitle: omarchy-window-title')
     manifest = manifest.replace('\t\t$ra: ra', '\t\t$ra: ra\n\t\t$omarchy: omarchy')
     manifest = manifest.replace('ContentInstallerMod: ra-content', 'ContentInstallerMod: omarchy-content')
+    manifest = manifest.replace('\tra|chrome.yaml', '\tra|chrome.yaml\n\tomarchy|chrome.yaml')
+    manifest = manifest.replace('\tra|chrome/ingame-player.yaml', '\tomarchy|ingame-player.yaml')
+    manifest = manifest.replace('\tra|chrome/gamesave-loading.yaml', '\tomarchy|gamesave-loading.yaml')
+    manifest = manifest.replace('\tcommon|chrome/ingame-menu.yaml', '\tomarchy|ingame-menu.yaml')
     if 'LoadScreen: LogoStripeLoadScreen\n\tImage: ra|uibits/loadscreen.png\n\tImage2x: ra|uibits/loadscreen-2x.png\n\tImage3x: ra|uibits/loadscreen-3x.png' not in manifest:
         raise RuntimeError('Pinned OpenRA loading screen declaration changed')
     manifest = manifest.replace('LoadScreen: LogoStripeLoadScreen\n\tImage: ra|uibits/loadscreen.png\n\tImage2x: ra|uibits/loadscreen-2x.png\n\tImage3x: ra|uibits/loadscreen-3x.png',
@@ -49,6 +53,19 @@ def build(engine, dll, output):
     shutil.copyfile(dll, mod / dll.name)
     for path in (ROOT / 'mod/ui').iterdir():
         shutil.copyfile(path, mod / path.name)
+    # Keep the pinned upstream widget layouts, changing only branded artwork references.
+    player = (engine / 'mods/ra/chrome/ingame-player.yaml').read_text()
+    player = player.replace('Logic: AddFactionSuffixLogic, IngameRadarDisplayLogic', 'Logic: IngameRadarDisplayLogic')
+    player = player.replace('ImageCollection: sidebar\n\t\t\t\t\tImageName: radar',
+                            'ImageCollection: omarchy-radar\n\t\t\t\t\tImageName: radar')
+    (mod / 'ingame-player.yaml').write_text(player)
+    save = (engine / 'mods/ra/chrome/gamesave-loading.yaml').read_text()
+    save = save.replace('Background: loadscreen-stripe', 'Background: panel-bg')
+    save = save.replace('ImageCollection: logos', 'ImageCollection: omarchy-brand')
+    (mod / 'gamesave-loading.yaml').write_text(save)
+    menu = (engine / 'mods/common/chrome/ingame-menu.yaml').read_text()
+    menu = menu.replace('ImageCollection: logos', 'ImageCollection: omarchy-brand')
+    (mod / 'ingame-menu.yaml').write_text(menu)
     # OpenRA's texture backend requires power-of-two sheet dimensions.
     cover = (mod / 'cover.png').read_bytes()
     if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
@@ -56,9 +73,19 @@ def build(engine, dll, output):
     # Reuse the stock content downloader, but return to Omarchy when it finishes.
     content_manifest = (engine / 'mods/ra-content/mod.yaml').read_text()
     content_manifest = content_manifest.replace('{DEV_VERSION}', 'release-20250330').replace('\tMod: ra\n', '\tMod: omarchy\n')
+    content_manifest = content_manifest.replace('\t\t$ra-content: racontent', '\t\t$ra-content: racontent\n\t\t$omarchy-content: omarchycontent')
+    content_manifest = content_manifest.replace('Chrome:\n\tcontent|chrome.yaml', 'Chrome:\n\tcontent|chrome.yaml\n\tomarchycontent|chrome.yaml')
+    content_manifest = content_manifest.replace('ChromeLayout:\n\tcontent|content.yaml', 'ChromeLayout:\n\tomarchycontent|content.yaml')
+    content_manifest = content_manifest.replace('Image: ^EngineDir|mods/common-content/chrome.png\n\tImage2x: ^EngineDir|mods/common-content/chrome-2x.png\n\tImage3x: ^EngineDir|mods/common-content/chrome-3x.png',
+                                                'Image: ^EngineDir|mods/omarchy-content/installer.png')
     (content / 'mod.yaml').write_text(content_manifest)
+    shutil.copyfile(mod / 'installer.png', content / 'installer.png')
+    shutil.copyfile(ROOT / 'mod/ui/content-chrome.yaml', content / 'chrome.yaml')
+    content_layout = (engine / 'mods/common-content/content.yaml').read_text()
+    content_layout = content_layout.replace('Background: background\n', 'Background: omarchy-installer-background\n', 1)
+    (content / 'content.yaml').write_text(content_layout)
     shutil.copyfile(engine / 'COPYING', mod / 'COPYING.OpenRA')
-    (mod / 'SOURCE.txt').write_text('OpenRA manifest/content configuration: https://github.com/OpenRA/OpenRA/tree/release-20250330 (GPL-3.0-or-later).\nCustom menu source: https://github.com/tcballard/command-and-conquer-omarchy/tree/codex/omarchy-skirmish/mod (GPL-3.0-or-later).\n')
+    (mod / 'SOURCE.txt').write_text('OpenRA manifest/content configuration: https://github.com/OpenRA/OpenRA/tree/release-20250330 (GPL-3.0-or-later).\nCustom menu source: https://github.com/tcballard/command-and-conquer-omarchy/tree/codex/omarchy-skirmish/mod (GPL-3.0-or-later).\nOmarchy emblem: https://omarchy.org/brand/omarchy-logo.svg (official brand artwork).\n')
     # Make the custom roster the mod defaults, not optional per-map overrides.
     art = mod / 'roster'
     art.mkdir(exist_ok=True)

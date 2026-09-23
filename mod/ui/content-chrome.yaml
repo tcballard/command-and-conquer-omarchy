@@ -1,0 +1,7 @@
+^OmarchyInstaller:
+	Image: installer.png
+
+omarchy-installer-background:
+	Inherits: ^OmarchyInstaller
+	PanelRegion: 0, 0, 0, 0, 1024, 480, 0, 0
+	PanelSides: Center

@@ -1,0 +1,12 @@
+^OmarchyBrand:
+	Image: omarchy-icon.png
+
+omarchy-brand:
+	Inherits: ^OmarchyBrand
+	Regions:
+		logo: 0, 0, 256, 256
+
+omarchy-radar:
+	Inherits: ^OmarchyBrand
+	Regions:
+		radar: 17, 17, 222, 222
