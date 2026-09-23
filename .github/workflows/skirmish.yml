@@ -53,6 +53,7 @@ jobs:
           export MOD_SEARCH_PATHS="$GITHUB_WORKSPACE/engine/mods,$GITHUB_WORKSPACE/build/mods"
           ./utility.sh omarchy --check-omarchy
           ./utility.sh omarchy --check-yaml
+          ./utility.sh omarchy-content --check-yaml
       - name: Publish self-contained Linux engine
         working-directory: engine
         run: dotnet publish -c Release -p:TargetPlatform=linux-x64 -p:CopyGenericLauncher=True -p:CopyCncDll=True -p:CopyD2kDll=False -r linux-x64 -p:PublishDir="$GITHUB_WORKSPACE/build/runtime" --self-contained true -m:1
@@ -119,7 +120,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag=v0.0.1-preview.6
+          tag=v0.0.1-preview.7
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Preview already exists; leaving its assets untouched."
             exit 0

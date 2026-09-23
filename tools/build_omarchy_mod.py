@@ -70,6 +70,10 @@ def build(engine, dll, output):
     cover = (mod / 'cover.png').read_bytes()
     if not cover.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', cover, 16) != (2048, 1024):
         raise RuntimeError('Loading screen must be a 2048x1024 PNG sheet')
+    for filename, size in (('omarchy-icon.png', (256, 256)), ('installer.png', (1024, 512))):
+        pixels = (mod / filename).read_bytes()
+        if not pixels.startswith(b'\x89PNG\r\n\x1a\n') or struct.unpack_from('>II', pixels, 16) != size:
+            raise RuntimeError(f'{filename} must be a {size[0]}x{size[1]} PNG sheet')
     # Reuse the stock content downloader, but return to Omarchy when it finishes.
     content_manifest = (engine / 'mods/ra-content/mod.yaml').read_text()
     content_manifest = content_manifest.replace('{DEV_VERSION}', 'release-20250330').replace('\tMod: ra\n', '\tMod: omarchy\n')
@@ -83,6 +87,12 @@ def build(engine, dll, output):
     shutil.copyfile(ROOT / 'mod/ui/content-chrome.yaml', content / 'chrome.yaml')
     content_layout = (engine / 'mods/common-content/content.yaml').read_text()
     content_layout = content_layout.replace('Background: background\n', 'Background: omarchy-installer-background\n', 1)
+    # Keep the poster title visible on the right while content setup is open.
+    for panel in ('CONTENT_PANEL', 'PACKAGE_DOWNLOAD_PANEL', 'SOURCE_INSTALL_PANEL', 'CONTENT_PROMPT_PANEL'):
+        needle = f'@{panel}:\n'
+        start = content_layout.index(needle)
+        x = content_layout.index('\tX: (WINDOW_WIDTH - WIDTH) / 2', start)
+        content_layout = content_layout[:x] + '\tX: 8' + content_layout[x + len('\tX: (WINDOW_WIDTH - WIDTH) / 2'):]
     (content / 'content.yaml').write_text(content_layout)
     shutil.copyfile(engine / 'COPYING', mod / 'COPYING.OpenRA')
     (mod / 'SOURCE.txt').write_text('OpenRA manifest/content configuration: https://github.com/OpenRA/OpenRA/tree/release-20250330 (GPL-3.0-or-later).\nCustom menu source: https://github.com/tcballard/command-and-conquer-omarchy/tree/codex/omarchy-skirmish/mod (GPL-3.0-or-later).\nOmarchy emblem: https://omarchy.org/brand/omarchy-logo.svg (official brand artwork).\n')
