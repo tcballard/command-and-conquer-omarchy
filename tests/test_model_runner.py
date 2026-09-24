@@ -158,3 +158,11 @@ class ModelRunnerTests(unittest.TestCase):
             result = subprocess.run([sys.executable, str(script), '--init', 'codex', '--model', 'other'], env=env, capture_output=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(Path(env['OMARCHY_AGENT_CONFIG']).read_bytes(), original)
+
+    def test_preflight_accepts_codex_required_empty_fields(self):
+        provider = Mock()
+        provider.decide.return_value = dict(kind='wait', group=[], count=1)
+        with patch.object(runner, 'load_config', return_value=dict(provider='codex', model='chosen')), \
+             patch.object(codex, 'Codex', return_value=provider), \
+             patch.object(sys, 'argv', ['runner', '--check']), patch('sys.stdout', new_callable=io.StringIO):
+            self.assertEqual(runner.main(), 0)

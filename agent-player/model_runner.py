@@ -295,7 +295,7 @@ def main():
             provider = Ollama(config)
         if args.check or args.launch:
             provider.verify()
-            if provider.decide('Setup check only. Return exactly {"kind":"wait"}.') != {'kind': 'wait'}:
+            if provider.decide('Setup check only. Return a wait action using the required schema fields.').get('kind') != 'wait':
                 raise Failure('invalid_model_action')
             print(f"Ready: {config['provider']} / {config['model']} (experimental)", flush=True)
             if args.launch:
