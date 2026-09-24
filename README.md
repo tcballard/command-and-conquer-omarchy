@@ -1,30 +1,27 @@
-> **v0.1.0:** three-faction skirmish with custom artwork, pinned engine and runtime. [Download the release](https://github.com/tcballard/command-and-conquer-omarchy/releases/tag/v0.1.0). First launch may download Red Alert terrain and sounds.
+<h1 align="center">Command & Conquer: Omarchy Edition</h1>
 
-# Command & Conquer: Omarchy Edition
+<p align="center"><strong>Build the ISO. Harvest packages. Send the coding agents into battle.</strong></p>
 
-![Omarchy Edition loading screen artwork](mod/ui/cover.png)
+![Illustrated Omarchy Edition battlefield and title artwork](assets/github-social-preview.png)
 
-Build the ISO. Harvest packages. Send DHH and the coding agents into battle.
-
-An Omarchy-themed **OpenRA Red Alert skirmish**, built for fun. The green
-Omarchians face **Reboot Required** and **The Walled Orchard**: two rival
-closed platforms fielding Bloatware tanks, Forced Update jets, Telemetry,
-and a particularly aggressive Antivirus.
-
-**Package Conflict** gives all three sides room to build, nearby ore fields and
-normal skirmish AI. No scripted waves or campaign countdown.
+An Omarchy-themed **OpenRA Red Alert skirmish** for x86_64 Omarchy. Play as the
+green Omarchians against two AI opponents, **Reboot Required** and **The Walled
+Orchard**, on the three-player **Package Conflict** map. Build a base and fight
+with custom faction artwork, units and an Omarchy-styled interface.
 
 **[Download the v0.1.0 installer →](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.1.0/install-omarchy-edition.sh)**
 
-One file includes the pinned engine, runtime, custom artwork and map, and
-adds an app-menu launcher that opens straight into the Omarchy-only skirmish
-lobby. On your x86_64 Omarchy PC, run:
+Run it as your normal user after downloading it to `~/Downloads`:
 
 ```bash
 bash ~/Downloads/install-omarchy-edition.sh
 ```
 
-[Setup, first launch and uninstall →](SKIRMISH.md) · [Release notes →](packaging/RELEASE-NOTES.md)
+The installer bundles the game, pinned engine and runtime. First launch may
+download Red Alert terrain and sounds. Preview 8 played well on an Omarchy PC;
+the [v0.1.0 release](https://github.com/tcballard/command-and-conquer-omarchy/releases/tag/v0.1.0)
+also passed its client, installer and artwork checks. [Setup and uninstall](SKIRMISH.md)
+· [Release notes](packaging/RELEASE-NOTES.md)
 
 ## A custom army on both sides
 
