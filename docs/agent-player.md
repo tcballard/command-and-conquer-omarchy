@@ -80,18 +80,27 @@ Wayland behaviour, or target-XPS compatibility. Those are later acceptance gates
 
 ## Validation status for this handoff
 
-Local build: OpenRA.Game and OpenRA.Mods.Common compiled from the pinned source;
-custom mod compiled against those outputs with zero warnings/errors. Engine YAML
-lint, the existing 11 Python tests, and protocol rejection/disconnect tests passed.
+Verified on the pinned engine in [CI run 36048863039](https://github.com/tcballard/command-and-conquer-omarchy/actions/runs/36048863039),
+implementation commit `ff48eb9c717d183bf14192e2ed469356a469c8b8`:
 
-**Combat validation is pending.** Local Xvfb cannot create sockets under this
-session's restrictions; escalation was rejected. Publishing was subsequently authorized and the branch is in draft PR #2.
-The first CI match exposed a location query on the non-spatial player actor;
-that startup defect is fixed and a fresh real-client run is required.
-The next run verified deployment, power/refinery/barracks construction, new
-infantry production, six in-game safety checks, and timeout/resume/stop. It ended
-unfinished after 1,955 game ticks: software rendering limited eight wall-clock
-minutes to about 78 game seconds, before combat. CI capture settings are adjusted
-and combat remains a required gate. The branch remains a draft until that test
-passes and its actual video/logs are inspected. A target-XPS model match remains
-an additional, later gate.
+- The original manual-client smoke test passed.
+- The deterministic real-client test reached tick 3006 (about two simulated minutes).
+  Omarchy built two power plants, a refinery, barracks and war factory, and produced
+  additional infantry and a light tank. Both rivals ran Normal AI in their locked slots.
+- The bridge dispatched 40 accepted actions, including two attacks against visible
+  enemies and a defensive order after actual damage to an owned unit. No live
+  action was rejected. Six separate game-side safety checks passed: stale ID,
+  invalid target, hidden target, foreign unit, fog-filtered observation and blocked placement.
+- A forced runner stall caused one disconnect. The client remained usable, resumed
+  with a fresh runner, and stopped through the panel. No fallback took over.
+- The match was deliberately stopped, with result `Undefined` and no winners.
+  This is first-slice integration evidence, not a completed match or a victory.
+
+The `agent-player-evidence` artifact contains the actual video, screenshot, replay
+and JSONL audit. Software rendering needed roughly 11 wall-clock minutes for the
+run. Local builds and protocol tests also passed. The current CI does not force
+an unaffordable game-side action or exercise every replay/epoch race; those remain
+additional validation work before provider integration.
+
+A full model-backed match and review on the target Omarchy XPS remain later gates.
+There is no supported model provider, production menu option or new release yet.
