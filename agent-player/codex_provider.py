@@ -15,7 +15,7 @@ DISABLED = ('shell_tool', 'unified_exec', 'shell_snapshot', 'shell_snapshot_v2',
             'code_mode', 'code_mode_only', 'code_mode_host', 'deferred_executor',
             'multi_agent', 'multi_agent_v2', 'collab', 'computer_use', 'browser_use',
             'image_generation', 'memories', 'memory_tool', 'tool_suggest',
-            'skill_mcp_dependency_install', 'remote_control')
+            'skill_mcp_dependency_install', 'remote_control', 'goals')
 
 
 def command(executable, schema, model):

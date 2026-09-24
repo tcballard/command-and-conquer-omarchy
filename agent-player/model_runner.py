@@ -306,6 +306,10 @@ def main():
                            OMARCHY_AGENT_CONFIG=str(config_path().resolve()))
                 env.pop('OMARCHY_AGENT_TEST', None)
                 env.pop('OMARCHY_AGENT_SELFTEST', None)
+                # Installed bundles need their existing content/support settings.
+                launcher = bundle.parent.parent / 'launch.sh'
+                if bundle.parent.name == 'releases' and launcher.is_file():
+                    os.execve('/bin/bash', ['bash', str(launcher)], env)
                 os.chdir(bundle)
                 os.execve(str(bundle / 'OpenRA'), [str(bundle / 'OpenRA'), 'Game.Mod=omarchy'], env)
             return 0

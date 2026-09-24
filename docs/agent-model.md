@@ -38,6 +38,16 @@ The running match checks that its selected model has not changed on reconnect.
 Launch repeats that check before opening the game. It requires a working account
 and consumes normal provider usage. Failure leaves the game unopened.
 
+For an installation built from this branch, launch its `current` directory with
+its bundled runner (this preserves the installer's content/support configuration):
+
+```sh
+python3 ~/.local/share/command-and-conquer-omarchy/current/agent-player/model_runner.py --launch ~/.local/share/command-and-conquer-omarchy/current
+```
+
+This command requires the **new branch build**; the existing v0.1.0 installation
+does not contain it.
+
 The panel identifies `codex / <model>`, shows the last accepted decision and
 supports Pause, Resume and Stop. Manual takeover is still deferred. A completed
 match records OpenRA's real result; Stop records an unfinished match.
