@@ -22,7 +22,7 @@ namespace OpenRA.Mods.Omarchy
         public override object Create(ActorInitializer init) => new AgentPlayer(this, init.World);
     }
 
-    public sealed partial class AgentPlayer : IBot, ITick, IResolveOrder, INotifyActorDisposing
+    public sealed partial class AgentPlayer : IBot, ITick, IResolveOrder, INotifyActorDisposing, INotifyDamage
     {
         readonly AgentPlayerInfo info;
         Player player;
@@ -35,6 +35,8 @@ namespace OpenRA.Mods.Omarchy
         readonly Stopwatch duration = new();
         bool enabled, paused, ended;
         int accepted, rejected, disconnects;
+        int lastDamageTick = -25;
+        readonly Queue<(int Tick, uint Victim, int[] Cell)> recentAttacks = new();
         string auditPath;
         object result = new { accepted = true, reason = "No action yet" };
         public string Status { get; private set; } = "Not connected";
@@ -152,6 +154,16 @@ namespace OpenRA.Mods.Omarchy
                 controller = "deterministic-test", provider = "none", accepted, rejected, disconnects, fallback = false });
         }
 
+        void INotifyDamage.Damaged(Actor self, AttackInfo e)
+        {
+            if (!enabled || ended || self.Owner != player || self.OccupiesSpace == null ||
+                e.Damage.Value <= 0 || world.WorldTick - lastDamageTick < 25) return;
+            lastDamageTick = world.WorldTick;
+            // The player knows its own damaged unit and cell. Never disclose a hidden attacker.
+            recentAttacks.Enqueue((lastDamageTick, self.ActorID, Cell(self.Location)));
+            while (recentAttacks.Count > 32) recentAttacks.Dequeue();
+        }
+
         void INotifyActorDisposing.Disposing(Actor self) => End("match closed");
 
         void ITick.Tick(Actor self)
@@ -236,6 +248,8 @@ namespace OpenRA.Mods.Omarchy
                     available = q.BuildableItems().Select(a => new { actor = a.Name, cost = q.GetProductionCost(a) }).ToArray(),
                     items = q.AllQueued().Select(i => new { actor = i.Item, done = i.Done }).ToArray() }).ToArray(),
                 explored = world.Map.AllCells.Where(c => player.Shroud.IsExplored(c)).Select(Cell).ToArray(),
+                recent_attacks = recentAttacks.Where(a => world.WorldTick - a.Tick <= 250)
+                    .Select(a => new { tick = a.Tick, victim = a.Victim, cell = a.Cell }).ToArray(),
                 placements, result };
         }
 
@@ -261,7 +275,8 @@ namespace OpenRA.Mods.Omarchy
                 accepted++;
                 LastDecision = $"Accepted {e.action.kind}: {e.action.actor ?? (e.action.group.Length + " owned unit(s)")}";
                 result = new { accepted = true, reason = "dispatched", request = e.request, kind = e.action.kind };
-                Audit(new { type = "action", tick = world.WorldTick, request = e.request, accepted = true, kind = e.action.kind, actor = e.action.actor });
+                Audit(new { type = "action", tick = world.WorldTick, request = e.request, accepted = true, kind = e.action.kind, actor = e.action.actor,
+                    responding_to_attack = e.action.kind == "defend" && recentAttacks.Any(a => world.WorldTick - a.Tick <= 250) });
             }
             catch (Exception ex) when (ex is InvalidDataException || ex is JsonException)
             {

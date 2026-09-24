@@ -86,7 +86,7 @@ jobs:
       - name: Real-client deterministic Agent Player test
         run: |
           python tools/fetch_test_content.py build/ra-quickinstall.zip
-          xvfb-run -a -s '-screen 0 1280x800x24' python tools/smoke_agent.py build/bundle --content build/ra-quickinstall.zip
+          xvfb-run -a -s '-screen 0 800x600x24' python tools/smoke_agent.py build/bundle --content build/ra-quickinstall.zip
       - uses: actions/upload-artifact@v4
         if: always()
         with:

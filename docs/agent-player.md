@@ -36,11 +36,11 @@ retries. Stderr is drained and discarded, never used as narration.
 Replies echo `version`, `token`, `request`, plus an `action` object. Observations
 contain tick, cash, power, owned actors, available production with costs, owned
 queue contents, explored cells, currently visible enemies, legal visible building
-placement candidates and the previous action result. An ID is the engine's
+placement candidates, recent damage to owned actors, and the previous action result. An ID is the engine's
 match-local ActorID, not a permanent identifier. Hidden target errors use the same
 `target unavailable` result as invalid IDs. No rival resources/queues are sent.
-The initial contract does not yet include recent-attack events or a full static
-prerequisite graph; these remain work before a model adapter.
+The initial contract does not yet include a full static prerequisite graph;
+that remains work before a model adapter.
 
 | kind | Fields | Meaning |
 | --- | --- | --- |
@@ -84,11 +84,14 @@ Local build: OpenRA.Game and OpenRA.Mods.Common compiled from the pinned source;
 custom mod compiled against those outputs with zero warnings/errors. Engine YAML
 lint, the existing 11 Python tests, and protocol rejection/disconnect tests passed.
 
-**Real-client validation is pending.** Local Xvfb cannot create sockets under this
+**Combat validation is pending.** Local Xvfb cannot create sockets under this
 session's restrictions; escalation was rejected. Publishing was subsequently authorized and the branch is in draft PR #2.
 The first CI match exposed a location query on the non-spatial player actor;
 that startup defect is fixed and a fresh real-client run is required.
-Successful construction/combat, lifecycle recovery and a playable match are
-not yet claimed. The branch remains a draft until that test
+The next run verified deployment, power/refinery/barracks construction, new
+infantry production, six in-game safety checks, and timeout/resume/stop. It ended
+unfinished after 1,955 game ticks: software rendering limited eight wall-clock
+minutes to about 78 game seconds, before combat. CI capture settings are adjusted
+and combat remains a required gate. The branch remains a draft until that test
 passes and its actual video/logs are inspected. A target-XPS model match remains
 an additional, later gate.
