@@ -1,3 +1,7 @@
 World:
 	LoadWidgetAtGameStart:
 		ShellmapRoot: OMARCHY_MENU
+	AgentPlayerPanel:
+
+Player:
+	AgentPlayer:

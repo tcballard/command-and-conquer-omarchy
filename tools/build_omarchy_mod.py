@@ -60,6 +60,7 @@ def build(engine, dll, output):
         (mod / 'mod.yaml.in').write_text(manifest)
         (mod / 'mod.yaml').write_text(manifest.replace('@OMARCHY_DLL@', str((mod / dll.name).resolve())))
     lobby = (engine / 'mods/common/chrome/lobby.yaml').read_text()
+    lobby = lobby.replace('Logic: LobbyLogic', 'Logic: LobbyLogic, AgentLobbyLogic')
     lobby = lobby.replace('Width: 900', 'Width: 1040').replace('Height: 600', 'Height: 560')
     lobby = lobby.replace('Width: 675', 'Width: 755').replace('X: 695 - WIDTH', 'X: 775 - WIDTH')
     lobby = lobby.replace('Y: 67', 'Y: 90').replace('Height: 219', 'Height: 175')

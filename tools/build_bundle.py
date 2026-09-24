@@ -41,6 +41,7 @@ def build(engine, published, mods, output):
         'License: GPL-3.0-or-later; see COPYING.\n'
         'Omarchy source and build scripts: https://github.com/tcballard/command-and-conquer-omarchy/tree/' + VERSION + '\n'
         'Red Alert content is downloaded by the upstream content installer on first launch; not included here.\n')
+    shutil.copytree(ROOT / 'agent-player', output / 'agent-player', ignore=shutil.ignore_patterns('__pycache__'))
     entries = []
     for path in sorted(output.rglob('*')):
         if path.is_file():
