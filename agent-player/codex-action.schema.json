@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "wait",
+        "deploy",
+        "produce",
+        "place",
+        "move",
+        "attack",
+        "defend",
+        "stop",
+        "set_rally"
+      ]
+    },
+    "actor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "group": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "cell": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "integer"
+      }
+    },
+    "target": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    }
+  },
+  "required": [
+    "kind",
+    "actor",
+    "group",
+    "cell",
+    "target",
+    "count"
+  ]
+}

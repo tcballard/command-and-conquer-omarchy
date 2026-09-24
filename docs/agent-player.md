@@ -1,6 +1,8 @@
 # Agent Player: experimental deterministic slice
 
-This branch adds a **test bot**, not a model-backed agent. Normal manual skirmish
+The initial slice adds a **deterministic test bot**. This branch now also has an
+experimental [Codex model adapter](agent-model.md); its full on-device match is
+still unverified. Normal manual skirmish
 still uses the existing menu and needs no Python process or API key. There is no
 new production menu option or release version.
 
@@ -20,7 +22,8 @@ synchronized pause epoch. Stop and quit records an unfinished summary and exits.
 Live manual takeover and automatic fallback are not implemented.
 
 The baseline v0.1.0 release is unchanged. Do not use this experimental mode for
-network play, saves, or provider integrations. There is no model adapter yet.
+network play or saves. Model-provider setup and its additional limitations are
+documented separately in [agent-model.md](agent-model.md).
 
 ## Protocol version 1
 
@@ -103,4 +106,5 @@ an unaffordable game-side action or exercise every replay/epoch race; those rema
 additional validation work before provider integration.
 
 A full model-backed match and review on the target Omarchy XPS remain later gates.
-There is no supported model provider, production menu option or new release yet.
+An experimental Codex adapter is now implemented (see agent-model.md), but there
+is no on-device model-match evidence, production menu option or new release yet.

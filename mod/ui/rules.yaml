@@ -5,3 +5,6 @@ World:
 
 Player:
 	AgentPlayer:
+	AgentPlayer@MODEL:
+		Type: omarchy-agent-model
+		Name: omarchy-agent-model-name

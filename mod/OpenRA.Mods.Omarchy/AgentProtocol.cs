@@ -24,6 +24,14 @@ namespace OpenRA.Mods.Omarchy
         public string token { get; set; }
         public int request { get; set; }
         public AgentAction action { get; set; }
+        public string error { get; set; }
+        public AgentMetrics metrics { get; set; }
+    }
+
+    public sealed class AgentMetrics
+    {
+        public int input_bytes { get; set; }
+        public int elapsed_ms { get; set; }
     }
 
     public sealed class AgentEnvelope
@@ -59,7 +67,17 @@ namespace OpenRA.Mods.Omarchy
             var reply = JsonSerializer.Deserialize<AgentReply>(json, new JsonSerializerOptions { MaxDepth = 8 });
             if (reply == null || reply.version != 1 || reply.token != token || reply.request != request)
                 throw new InvalidDataException("Invalid session or request");
-            Shape(reply.action);
+            if (reply.error != null)
+            {
+                if (reply.action != null || (reply.error != "configuration" && reply.error != "provider_unavailable" &&
+                    reply.error != "provider_timeout" && reply.error != "invalid_model_action" &&
+                    reply.error != "context_limit" && reply.error != "request_limit"))
+                    throw new InvalidDataException("Invalid runner failure");
+            }
+            else Shape(reply.action);
+            if (reply.metrics != null && (reply.metrics.input_bytes < 0 || reply.metrics.input_bytes > 24000 ||
+                reply.metrics.elapsed_ms < 0 || reply.metrics.elapsed_ms > 60000))
+                throw new InvalidDataException("Invalid decision metrics");
             return reply;
         }
 

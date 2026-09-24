@@ -15,7 +15,8 @@ namespace OpenRA.Mods.Omarchy
     [TraitLocation(SystemActors.Player)]
     public sealed class AgentPlayerInfo : TraitInfo, IBotInfo
     {
-        public string Type => "omarchy-agent-test";
+        public readonly string Type = "omarchy-agent-test";
+        string IBotInfo.Type => Type;
         [FluentReference]
         public readonly string Name = "omarchy-agent-test-name";
         string IBotInfo.Name => Name;
@@ -33,6 +34,13 @@ namespace OpenRA.Mods.Omarchy
         int request, epoch, resolvedEpoch, lastResolved, nextTick, decisionTick;
         readonly Stopwatch decisionClock = new();
         readonly Stopwatch duration = new();
+        readonly Stopwatch cadenceClock = new();
+        public string ControllerType => info.Type;
+        bool IsModel => info.Type == "omarchy-agent-model";
+        string Provider => IsModel ? AgentLaunch.Provider : "none";
+        string Controller => IsModel ? "model" : "deterministic-test";
+        string ModelName => IsModel ? AgentLaunch.ModelName : "none";
+        public string ControllerLabel => IsModel ? Provider + " / " + ModelName : "TEST BOT (no model)";
         bool enabled, paused, ended;
         int accepted, rejected, disconnects;
         int lastDamageTick = -25;
@@ -54,7 +62,7 @@ namespace OpenRA.Mods.Omarchy
             world = p.World;
             // The experimental controller is not available to network matches.
             var clients = world.LobbyInfo.Clients.Where(c => c.Bot == null).ToArray();
-            if (Environment.GetEnvironmentVariable("OMARCHY_AGENT_TEST") != "1" || p.InternalName != "Multi0" ||
+            if (!AgentLaunch.Enabled || p.BotType != AgentLaunch.BotType || p.InternalName != "Multi0" ||
                 clients.Length != 1 || !clients[0].IsObserver || !Game.IsHost)
             {
                 Status = "Unavailable: use the local test launcher";
@@ -67,7 +75,7 @@ namespace OpenRA.Mods.Omarchy
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
             { Status = "Paused: cannot create match evidence"; paused = true; return; }
             auditPath = Path.Combine(directory, DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N") + ".jsonl");
-            Audit(new { type = "start", slots = world.LobbyInfo.Clients.Where(c => c.Bot != null).Select(c => new { slot = c.Slot, bot = c.Bot, spawn = c.SpawnPoint, faction = c.Faction }).ToArray(), controller = "deterministic-test", provider = "none", fallback = false });
+            Audit(new { type = "start", slots = world.LobbyInfo.Clients.Where(c => c.Bot != null).Select(c => new { slot = c.Slot, bot = c.Bot, spawn = c.SpawnPoint, faction = c.Faction }).ToArray(), controller = Controller, provider = Provider, model = ModelName, fallback = false });
             if (!paused) StartRunner();
         }
 
@@ -83,8 +91,8 @@ namespace OpenRA.Mods.Omarchy
             epoch++;
             world.IssueOrder(new Order("OmarchyAgentEpoch", player.PlayerActor, false) { ExtraData = (uint)epoch });
             token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-            var script = Path.Combine(Platform.EngineDir, "agent-player", "test_adapter.py");
-            if (!File.Exists(script)) { Status = "Paused: test adapter missing"; paused = true; return; }
+            var script = Path.Combine(Platform.EngineDir, "agent-player", IsModel ? "model_runner.py" : "test_adapter.py");
+            if (!File.Exists(script)) { Status = "Paused: runner missing"; paused = true; return; }
             try
             {
                 var start = new ProcessStartInfo("python3")
@@ -98,7 +106,8 @@ namespace OpenRA.Mods.Omarchy
                 runner = Process.Start(start);
                 // Never record untrusted runner stderr or secrets; drain to avoid pipe backpressure.
                 _ = DrainErrors(runner.StandardError);
-                Status = "Agent connected — TEST BOT";
+                Status = IsModel ? "Connecting to " + Provider : "Agent connected — TEST BOT";
+                LastDecision = ControllerLabel;
                 nextTick = world.WorldTick + 25;
             }
             catch (Exception e) when (e is IOException || e is System.ComponentModel.Win32Exception)
@@ -123,14 +132,14 @@ namespace OpenRA.Mods.Omarchy
             runner.Dispose(); runner = null;
         }
 
-        void Disconnect()
+        void Disconnect(string reason = "runner disconnected")
         {
             disconnects++;
             paused = true;
             KillRunner();
             world.IssueOrder(new Order("OmarchyAgentEpoch", player.PlayerActor, false) { ExtraData = (uint)epoch });
-            Status = "Reconnecting — paused; press Resume";
-            Audit(new { type = "disconnect", tick = world.WorldTick });
+            Status = "Paused — " + reason + "; Resume to reconnect";
+            Audit(new { type = "disconnect", tick = world.WorldTick, reason });
         }
 
         public void TogglePause()
@@ -151,7 +160,7 @@ namespace OpenRA.Mods.Omarchy
             Audit(new { type = "summary", reason, duration_seconds = duration.Elapsed.TotalSeconds,
                 tick = world.WorldTick, result = player.WinState.ToString(),
                 winners = world.Players.Where(p => p.WinState == WinState.Won).Select(p => p.InternalName).ToArray(),
-                controller = "deterministic-test", provider = "none", accepted, rejected, disconnects, fallback = false });
+                controller = Controller, provider = Provider, model = ModelName, accepted, rejected, disconnects, fallback = false });
         }
 
         void INotifyDamage.Damaged(Actor self, AttackInfo e)
@@ -174,27 +183,32 @@ namespace OpenRA.Mods.Omarchy
             if (paused) return;
             if (pending != null)
             {
-                if (decisionClock.Elapsed.TotalSeconds > 5 || world.WorldTick - decisionTick > 150) { Disconnect(); return; }
+                if (decisionClock.Elapsed.TotalSeconds > (IsModel ? 30 : 5) || world.WorldTick - decisionTick > (IsModel ? 750 : 150))
+                { Disconnect("decision timeout"); return; }
                 if (!pending.IsCompleted) return;
                 try
                 {
                     var reply = AgentProtocol.Parse(pending.GetAwaiter().GetResult(), token, request);
                     pending = null;
+                    if (reply.error != null) { Disconnect(reply.error); return; }
+                    if (IsModel && reply.metrics != null)
+                        Audit(new { type = "decision", tick = world.WorldTick, request, reply.metrics.input_bytes, reply.metrics.elapsed_ms });
                     var envelope = new AgentEnvelope { request = request, epoch = epoch,
                         deadline = world.WorldTick + 25, action = reply.action };
                     world.IssueOrder(new Order("OmarchyAgentAction", self, false) { TargetString = JsonSerializer.Serialize(envelope) });
-                    Status = "Acting — TEST BOT";
+                    Status = "Acting — " + ControllerLabel;
+                    cadenceClock.Restart();
                     nextTick = world.WorldTick + 25;
                 }
                 catch (Exception e) when (e is IOException || e is JsonException || e is InvalidOperationException || e is ObjectDisposedException)
                 { Disconnect(); }
                 return;
             }
-            if (world.WorldTick < nextTick) return;
+            if (world.WorldTick < nextTick || (IsModel && cadenceClock.IsRunning && cadenceClock.Elapsed.TotalSeconds < 2)) return;
             request++;
             decisionTick = world.WorldTick;
             decisionClock.Restart();
-            Status = "Deciding — TEST BOT";
+            Status = "Deciding — " + ControllerLabel;
             // Both pipe write and read run off the game thread. Only immutable JSON crosses threads.
             var json = JsonSerializer.Serialize(Observe());
             var process = runner;
@@ -245,8 +259,10 @@ namespace OpenRA.Mods.Omarchy
                     player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.CanBeViewedByPlayer(player) &&
                     a.Info.HasTraitInfo<IOccupySpaceInfo>()).OrderBy(a => a.ActorID).Select(a => new { id = a.ActorID, actor = a.Info.Name, cell = Cell(a.Location) }).ToArray(),
                 production = queues.Select(q => new { producer = q.Actor.ActorID, queue = q.Info.Type,
-                    available = q.BuildableItems().Select(a => new { actor = a.Name, cost = q.GetProductionCost(a) }).ToArray(),
+                    available = q.BuildableItems().Select(a => new { actor = a.Name, cost = q.GetProductionCost(a), prerequisites = a.TraitInfo<BuildableInfo>().Prerequisites }).ToArray(),
                     items = q.AllQueued().Select(i => new { actor = i.Item, done = i.Done }).ToArray() }).ToArray(),
+                tech = IsModel ? world.Map.Rules.Actors.Values.Where(a => a.HasTraitInfo<BuildingInfo>() && a.HasTraitInfo<BuildableInfo>())
+                    .OrderBy(a => a.Name).Select(a => new { actor = a.Name, prerequisites = a.TraitInfo<BuildableInfo>().Prerequisites }).ToArray() : null,
                 explored = world.Map.AllCells.Where(c => player.Shroud.IsExplored(c)).Select(Cell).ToArray(),
                 recent_attacks = recentAttacks.Where(a => world.WorldTick - a.Tick <= 250)
                     .Select(a => new { tick = a.Tick, victim = a.Victim, cell = a.Cell }).ToArray(),
@@ -255,7 +271,7 @@ namespace OpenRA.Mods.Omarchy
 
         void IResolveOrder.ResolveOrder(Actor self, Order order)
         {
-            if (self.Owner.BotType != "omarchy-agent-test" || self.Owner.InternalName != "Multi0") return;
+            if (self.Owner.BotType != info.Type || self.Owner.InternalName != "Multi0") return;
             if (order.OrderString == "OmarchyAgentEpoch") { resolvedEpoch = (int)order.ExtraData; return; }
             if (order.OrderString != "OmarchyAgentAction") return;
             if (world.IsReplay) player = self.Owner;

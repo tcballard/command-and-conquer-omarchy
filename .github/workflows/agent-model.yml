@@ -1,0 +1,22 @@
+name: Agent model contract
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  codex-contract:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Codex CLI (no account credentials)
+        run: npm install -g @openai/codex@0.156.1
+      - name: Verify Codex CLI and action restrictions against a fake model endpoint
+        run: python tools/check_codex_contract.py

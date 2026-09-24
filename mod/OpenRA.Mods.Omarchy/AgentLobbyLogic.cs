@@ -13,7 +13,7 @@ namespace OpenRA.Mods.Omarchy
         public AgentLobbyLogic(OrderManager orderManager)
         {
             this.orderManager = orderManager;
-            if (Environment.GetEnvironmentVariable("OMARCHY_AGENT_TEST") == "1")
+            if (AgentLaunch.Enabled)
             {
                 Game.LobbyInfoChanged += ConfigureAgentMatch;
                 ConfigureAgentMatch();
@@ -32,7 +32,7 @@ namespace OpenRA.Mods.Omarchy
             }
             if (!local.IsObserver) return;
             var slots = new[] { "Multi0", "Multi1", "Multi2" };
-            var bots = new[] { "omarchy-agent-test", "normal", "normal" };
+            var bots = new[] { AgentLaunch.BotType, "normal", "normal" };
             if (agentSetupStep <= 3)
             {
                 var i = agentSetupStep - 1;
