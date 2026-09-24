@@ -7,7 +7,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-22.04
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,7 +34,9 @@ jobs:
       - name: Install engine libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y liblua5.1-0 libsdl2-2.0-0 libopenal1 libfreetype6 xvfb libgl1-mesa-dri libegl1
+          sudo apt-get install -y liblua5.1-0 libsdl2-2.0-0 libopenal1 libfreetype6 xvfb libgl1-mesa-dri libegl1 xdotool ffmpeg
+      - name: Test agent protocol boundaries
+        run: dotnet run --project tests/AgentProtocol.Tests
       - name: Build pinned OpenRA
         id: engine-build
         working-directory: engine
@@ -81,6 +83,21 @@ jobs:
           ./OpenRA.Utility omarchy --check-yaml
       - name: Smoke test the real bundled game client
         run: SDL_VIDEODRIVER=x11 xvfb-run -a python tools/smoke_bundle.py build/bundle
+      - name: Real-client deterministic Agent Player test
+        run: |
+          python tools/fetch_test_content.py build/ra-quickinstall.zip
+          xvfb-run -a -s '-screen 0 800x600x24' python tools/smoke_agent.py build/bundle --content build/ra-quickinstall.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agent-player-evidence
+          path: |
+            build/agent-evidence/*.log
+            build/agent-evidence/*.mp4
+            build/agent-evidence/*.png
+            build/agent-evidence/support/Logs
+            build/agent-evidence/support/AgentPlayer
+            build/agent-evidence/support/Replays
       - name: Build single-file installer
         run: |
           python tools/build_installer.py

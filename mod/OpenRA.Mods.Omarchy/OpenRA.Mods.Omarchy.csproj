@@ -7,6 +7,7 @@
     <EngineDir Condition="'$(EngineDir)' == ''">../../../engine/bin</EngineDir>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Eluant"><HintPath>$(EngineDir)/Eluant.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="OpenRA.Game"><HintPath>$(EngineDir)/OpenRA.Game.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="OpenRA.Mods.Common"><HintPath>$(EngineDir)/OpenRA.Mods.Common.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
