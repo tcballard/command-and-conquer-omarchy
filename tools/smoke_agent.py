@@ -71,7 +71,7 @@ def main():
     states = [r for r in rows if r['type'] == 'state']
     actions = [r for r in rows if r['type'] == 'action']
     checks = {r['name'] for r in rows if r['type'] == 'check' and r['passed']}
-    assert rows and rows[0]['slots'] == [
+    assert rows and sorted(rows[0]['slots'], key=lambda s: s['slot']) == [
         {'slot': 'Multi0', 'bot': 'omarchy-agent-test', 'spawn': 1, 'faction': 'allies'},
         {'slot': 'Multi1', 'bot': 'normal', 'spawn': 2, 'faction': 'soviet'},
         {'slot': 'Multi2', 'bot': 'normal', 'spawn': 3, 'faction': 'russia'}], rows[:1]
@@ -80,7 +80,7 @@ def main():
     assert {'stale-id', 'invalid-target', 'hidden-target', 'foreign-unit', 'fog-observation', 'blocked-placement'} <= checks, checks
     assert stalled and resumed and any(r['type'] == 'resume' for r in rows), 'Disconnect recovery failed'
     assert any(r['type'] == 'summary' for r in rows), 'No stopped/result summary'
-    assert not (support / 'Logs/exception.log').exists(), 'Engine exception'
+    assert not list((support / 'Logs').glob('exception*.log')), 'Engine exception'
     print('Real client: correct factions, construction, troops, combat, safety checks and timeout/resume verified.')
 
 

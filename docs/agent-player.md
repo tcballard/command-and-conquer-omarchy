@@ -85,9 +85,10 @@ custom mod compiled against those outputs with zero warnings/errors. Engine YAML
 lint, the existing 11 Python tests, and protocol rejection/disconnect tests passed.
 
 **Real-client validation is pending.** Local Xvfb cannot create sockets under this
-session's restrictions; escalation was rejected. Automatic approval review also
-blocked pushing the feature branch, so the proposed CI smoke test has not run.
-No screenshot, successful construction/combat, lifecycle recovery or playable
-match is claimed from this session. The branch remains a draft until that test
+session's restrictions; escalation was rejected. Publishing was subsequently authorized and the branch is in draft PR #2.
+The first CI match exposed a location query on the non-spatial player actor;
+that startup defect is fixed and a fresh real-client run is required.
+Successful construction/combat, lifecycle recovery and a playable match are
+not yet claimed. The branch remains a draft until that test
 passes and its actual video/logs are inspected. A target-XPS model match remains
 an additional, later gate.

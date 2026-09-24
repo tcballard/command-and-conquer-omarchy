@@ -213,7 +213,10 @@ namespace OpenRA.Mods.Omarchy
             var owned = Owned();
             var queues = Queues();
             var power = player.PlayerActor.Trait<PowerManager>();
-            var origin = owned.FirstOrDefault(a => a.Info.Name == "fact")?.Location ?? owned.First().Location;
+            // The player actor owns production queues but has no map location.
+            var spatial = owned.Where(a => a.OccupiesSpace != null).ToArray();
+            var origin = spatial.FirstOrDefault(a => a.Info.Name == "fact")?.Location ??
+                spatial.FirstOrDefault()?.Location ?? new CPos(0, 0);
             var placements = new Dictionary<string, int[][]>();
             foreach (var item in queues.SelectMany(q => q.AllQueued()).Where(i => i.Done).Select(i => i.Item).Distinct())
             {
@@ -225,7 +228,7 @@ namespace OpenRA.Mods.Omarchy
             }
             return new { version = 1, token, request, tick = world.WorldTick, cash = player.PlayerActor.Trait<PlayerResources>().GetCashAndResources(),
                 power = new { provided = power.PowerProvided, used = power.PowerDrained },
-                own = owned.Where(a => a.Info.HasTraitInfo<IOccupySpaceInfo>()).Select(Unit).ToArray(),
+                own = spatial.Select(Unit).ToArray(),
                 enemies = world.Actors.Where(a => a.IsInWorld && !a.IsDead && a.Owner != player &&
                     player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.CanBeViewedByPlayer(player) &&
                     a.Info.HasTraitInfo<IOccupySpaceInfo>()).OrderBy(a => a.ActorID).Select(a => new { id = a.ActorID, actor = a.Info.Name, cell = Cell(a.Location) }).ToArray(),
@@ -238,6 +241,7 @@ namespace OpenRA.Mods.Omarchy
 
         void IResolveOrder.ResolveOrder(Actor self, Order order)
         {
+            if (self.Owner.BotType != "omarchy-agent-test" || self.Owner.InternalName != "Multi0") return;
             if (order.OrderString == "OmarchyAgentEpoch") { resolvedEpoch = (int)order.ExtraData; return; }
             if (order.OrderString != "OmarchyAgentAction") return;
             if (world.IsReplay) player = self.Owner;

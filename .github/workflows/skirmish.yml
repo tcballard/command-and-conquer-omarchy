@@ -91,7 +91,13 @@ jobs:
         if: always()
         with:
           name: agent-player-evidence
-          path: build/agent-evidence
+          path: |
+            build/agent-evidence/*.log
+            build/agent-evidence/*.mp4
+            build/agent-evidence/*.png
+            build/agent-evidence/support/Logs
+            build/agent-evidence/support/AgentPlayer
+            build/agent-evidence/support/Replays
       - name: Build single-file installer
         run: |
           python tools/build_installer.py
