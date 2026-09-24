@@ -6,5 +6,6 @@ command -v python3 >/dev/null
 [ -f "$bundle/agent-player/test_adapter.py" ] || { echo 'Build a bundle from the agent-player feature branch first.' >&2; exit 1; }
 shift
 cd "$bundle"
+unset OMARCHY_AGENT_MODE OMARCHY_AGENT_MODEL
 export OMARCHY_AGENT_TEST=1
 exec ./OpenRA Game.Mod=omarchy "$@"

@@ -15,9 +15,9 @@ namespace OpenRA.Mods.Omarchy
         AgentPlayer controller;
         void IPostWorldLoaded.PostWorldLoaded(World world, WorldRenderer wr)
         {
-            var player = world.Players.FirstOrDefault(p => p.BotType == "omarchy-agent-test");
-            if (player == null || world.IsReplay || System.Environment.GetEnvironmentVariable("OMARCHY_AGENT_TEST") != "1") return;
-            controller = player.PlayerActor.Trait<AgentPlayer>();
+            var player = world.Players.FirstOrDefault(p => p.BotType == AgentLaunch.BotType);
+            if (player == null || world.IsReplay || !AgentLaunch.Enabled) return;
+            controller = player.PlayerActor.TraitsImplementing<AgentPlayer>().Single(t => t.ControllerType == player.BotType);
             world.RenderPlayer = player;
             var mcv = world.Actors.FirstOrDefault(a => a.Owner == player && a.IsInWorld && a.Info.Name == "mcv");
             if (mcv != null) wr.Viewport.Center(mcv.CenterPosition);
@@ -25,7 +25,7 @@ namespace OpenRA.Mods.Omarchy
             panel.AddChild(new LabelWidget(Game.ModData) { Bounds = new WidgetBounds(12, 8, 486, 22), GetText = () => controller.Status });
             panel.AddChild(new LabelWidget(Game.ModData) { Bounds = new WidgetBounds(12, 31, 486, 22), GetText = () => controller.LastDecision });
             panel.AddChild(new ButtonWidget(Game.ModData) { Bounds = new WidgetBounds(12, 68, 140, 30),
-                GetText = () => controller.Paused ? "Resume test bot" : "Pause orders", OnClick = controller.TogglePause });
+                GetText = () => controller.Paused ? "Resume controller" : "Pause orders", OnClick = controller.TogglePause });
             panel.AddChild(new ButtonWidget(Game.ModData) { Bounds = new WidgetBounds(165, 68, 140, 30),
                 GetText = () => "Stop and quit", OnClick = () => { controller.End("user stopped"); Game.Exit(); } });
             Ui.Root.AddChild(panel);

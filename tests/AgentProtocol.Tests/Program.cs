@@ -29,6 +29,11 @@ class Program
         Reject(() => AgentProtocol.Shape(new AgentAction { kind = "attack", group = new uint[33] }));
         Reject(() => AgentProtocol.Shape(new AgentAction { kind = "produce", count = -1 }));
         Reject(() => AgentProtocol.Shape(new AgentAction { kind = "stop", group = null }));
+        var failure = "{\"version\":1,\"token\":\"session\",\"request\":7,\"error\":\"provider_timeout\"}";
+        if (AgentProtocol.Parse(failure, "session", 7).error != "provider_timeout") throw new Exception();
+        Reject(() => AgentProtocol.Parse(failure.Replace("provider_timeout", "secret free-form error"), "session", 7));
+        Reject(() => AgentProtocol.Parse(good.Replace("\"action\":", "\"error\":\"provider_timeout\",\"action\":"), "session", 7));
+        Reject(() => AgentProtocol.Parse(good.Replace("\"action\":", "\"metrics\":{\"input_bytes\":-1},\"action\":"), "session", 7));
         using var large = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(new string('a', 9000))));
         try { await AgentProtocol.ReadLine(large); throw new Exception("Oversize input accepted"); }
         catch (InvalidDataException) { cases++; }
