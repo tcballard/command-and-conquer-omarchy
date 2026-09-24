@@ -1,4 +1,4 @@
-> **Bundled preview 8 (release candidate):** three-faction skirmish with custom artwork, pinned engine and runtime. The [preview installer](https://github.com/tcballard/command-and-conquer-omarchy/releases/tag/v0.0.1-preview.8) becomes available after release publication. First launch may download Red Alert terrain and sounds.
+> **v0.1.0:** three-faction skirmish with custom artwork, pinned engine and runtime. [Download the release](https://github.com/tcballard/command-and-conquer-omarchy/releases/tag/v0.1.0). First launch may download Red Alert terrain and sounds.
 
 # Command & Conquer: Omarchy Edition
 
@@ -14,7 +14,7 @@ and a particularly aggressive Antivirus.
 **Package Conflict** gives all three sides room to build, nearby ore fields and
 normal skirmish AI. No scripted waves or campaign countdown.
 
-**[Preview 8 installer (after publication) →](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.8/install-omarchy-edition.sh)**
+**[Download the v0.1.0 installer →](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.1.0/install-omarchy-edition.sh)**
 
 One file includes the pinned engine, runtime, custom artwork and map, and
 adds an app-menu launcher that opens straight into the Omarchy-only skirmish
@@ -24,7 +24,7 @@ lobby. On your x86_64 Omarchy PC, run:
 bash ~/Downloads/install-omarchy-edition.sh
 ```
 
-[Setup, first launch and uninstall →](SKIRMISH.md) · [Preview release notes →](packaging/PREVIEW-NOTES.md)
+[Setup, first launch and uninstall →](SKIRMISH.md) · [Release notes →](packaging/RELEASE-NOTES.md)
 
 ## A custom army on both sides
 

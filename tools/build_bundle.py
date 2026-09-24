@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-VERSION = 'v0.0.1-preview.8'
+VERSION = 'v0.1.0'
 
 
 def build(engine, published, mods, output):
