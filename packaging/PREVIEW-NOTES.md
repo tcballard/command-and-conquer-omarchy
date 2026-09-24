@@ -1,27 +1,31 @@
-# Bundled Omarchy Edition — preview 7
+# Bundled Omarchy Edition — preview 8
 
-The loading screen shows the approved poster with Omarchy lettering and “EDITION” beneath the Command & Conquer title. Preview 7 also carries the poster into first-run content installation, and uses the official Omarchy emblem on saved-game loading, the in-game menu and the Soviet radar panel. The hammer and sickle no longer appears on these screens in the Omarchy mod.
+Package Conflict now has three fixed players: green Omarchy, pink **Reboot Required**, and purple **The Walled Orchard**. The two AI opponents share the original custom closed-platform army, but have distinct names, colours and original faction flags. The unused combined Walled Garden flag remains available for generic or random faction UI. Vendor-specific names in the army roster have been replaced with original jokes.
 
-This release includes its own pinned OpenRA engine, .NET runtime, dedicated Omarchy mod and complete 91-entry custom faction roster. It does not install or launch the system OpenRA package. Only Package Conflict is playable.
-
-The custom rules, sprites and names are now mod defaults. Both the build and installer load the actual game rules and check every faction-specific image, palette and sprite asset. A failed check stops installation before switching the active build.
+The map adds a third start and two ore mines, keeping the resource field rotationally symmetric. The lobby shows all three factions and allows the third slot to be filled with an AI. Omarchy's radar, HUD, command bar, menu, loading screen and installer artwork use the themed assets. The bundled engine and .NET runtime remain pinned to OpenRA `release-20250330`.
 
 ## Install
 
-Download `install-omarchy-edition.sh` and its `.sha256` sidecar, then run in their directory:
+After the release assets are published, download `install-omarchy-edition.sh` and its `.sha256` sidecar together, then run:
 
 ```bash
 sha256sum --check install-omarchy-edition.sh.sha256
 bash install-omarchy-edition.sh
 ```
 
-Run without sudo. The app launcher is **Command & Conquer: Omarchy Edition**. The window title says **preview 7 (bundled)**. First launch may download the Red Alert terrain and sounds via the content installer; these are not embedded in the bundle. Existing content is reused where available.
+Run as your normal user, without sudo. The app launcher is **Command & Conquer: Omarchy Edition**. The window title says **preview 8 (bundled)**. First launch may download Red Alert terrain and sounds; the bundle does not contain that content. Existing downloads can be reused.
 
-To verify or launch the precise installed bundle:
+In the Package Conflict lobby, take the green Omarchy slot and assign an AI to both the pink and purple slots. To check the installed bundle or launch it again:
 
 ```bash
 bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/launch.sh" --verify
 bash "${XDG_DATA_HOME:-$HOME/.local/share}/command-and-conquer-omarchy/launch.sh"
 ```
 
-The previous OpenRA installation, maps and saves are left intact. Omarchy keeps its own settings and saves. This is still a preview: a full XPS match and visual review remain required.
+The installer checks the payload digest and all 136 faction image resolutions before activating the new build. An existing bundled installation is retained if verification fails. `bash install-omarchy-edition.sh --uninstall` removes the bundle and launcher but preserves content, settings and saves. It leaves any system OpenRA installation untouched.
+
+## Verification scope
+
+The skirmish tests cover economy, routes, map packaging and assets. The CI workflow builds the pinned OpenRA engine and Omarchy mod, checks whole-mod YAML and roster images, runs the bundled client under virtual X11, installs the generated artifact in a clean home and verifies its digest. A live local lobby was exercised with both AI slots filled and a three-player match started; a full match on an Omarchy device remains untested.
+
+Release assets and checksum must come from the successful CI run for the Preview 8 source commit. This note is prepared before publication.

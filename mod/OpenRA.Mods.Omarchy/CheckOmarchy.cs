@@ -26,8 +26,11 @@ namespace OpenRA.Mods.Omarchy
                 throw new InvalidOperationException("Omarchy must expose exactly one skirmish, one backdrop, and no missions.");
             using var reader = new StreamReader(mod.DefaultFileSystem.Open("omarchy|roster-check.tsv"));
             var expected = reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            if (expected.Length != 91)
-                throw new InvalidOperationException("The complete 91-entry faction roster is required.");
+            if (expected.Length != 136 || expected.Distinct().Count() != expected.Length ||
+                expected.Count(row => row.Split('\t')[1] == "allies") != 46 ||
+                expected.Count(row => row.Split('\t')[1] == "soviet") != 45 ||
+                expected.Count(row => row.Split('\t')[1] == "russia") != 45)
+                throw new InvalidOperationException("The complete three-faction roster is required.");
             foreach (var preview in available)
             {
                 using var map = new Map(mod, preview.Package);
@@ -43,7 +46,7 @@ namespace OpenRA.Mods.Omarchy
                         throw new InvalidOperationException($"Custom roster missing: {row} on {map.Title}");
                 }
             }
-            Console.WriteLine("All 91 faction roster entries resolve to custom images in both maps.");
+            Console.WriteLine("All 136 faction roster entries resolve to custom images in both maps.");
             Console.WriteLine("Omarchy catalog verified: one playable skirmish, one backdrop, no campaign; custom menu resolves.");
         }
     }

@@ -86,7 +86,7 @@ cat > "$applications/$app_id.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Command & Conquer: Omarchy Edition
-Comment=Bundled Omarchy skirmish — custom units vs The Walled Garden
+Comment=Bundled Omarchy skirmish against two rival platforms
 Exec="$desktop_path/launch.sh"
 Icon=$app_dir/current/mods/omarchy/omarchy-icon.png
 Terminal=false
@@ -108,7 +108,7 @@ REMOVE
 } > "$app_dir/uninstall.sh"
 chmod 755 "$app_dir/uninstall.sh"
 command -v update-desktop-database >/dev/null && update-desktop-database "$applications" || true
-echo "Installed bundled Omarchy Edition $version; all 91 faction roster entries verified."
+echo "Installed bundled Omarchy Edition $version; all 136 faction roster entries verified."
 echo 'First launch may ask to download Red Alert terrain and sounds.'
 printf 'Launch: bash %q\n' "$app_dir/launch.sh"
 if [[ $mode == install ]]; then "$app_dir/launch.sh"; fi

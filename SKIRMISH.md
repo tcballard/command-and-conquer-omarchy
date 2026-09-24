@@ -7,7 +7,7 @@ skirmish victory rules apply. There are no missions, waves or deadlines.
 
 ## Play on Omarchy
 
-Download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.7/install-omarchy-edition.sh)** from the preview release,
+After Preview 8 is published, download **[install-omarchy-edition.sh](https://github.com/tcballard/command-and-conquer-omarchy/releases/download/v0.0.1-preview.8/install-omarchy-edition.sh)**,
 then run it as your normal user:
 
 ```sh
@@ -20,7 +20,7 @@ Git, Python or sudo is needed. First launch may download Red Alert terrain
 and sounds; existing content is reused where available.
 
 The only playable map is Package Conflict. The window title says
-**preview 7 (bundled)**. There is no map-change button, campaign browser,
+**preview 8 (bundled)**. There is no map-change button, campaign browser,
 multiplayer browser or editor entry point. Leaving the lobby shows
 Skirmish, Settings and Quit.
 
